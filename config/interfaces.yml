@@ -1,0 +1,148 @@
+userPortalLogin:
+  interface: User
+  type: GET
+
+getCallData:
+  interface: Calls
+  type: GET
+getCallMetrics:
+  interface: Calls
+  type: GET
+getCallRecording:
+  interface: Calls
+  type: GET
+
+createCallFlow:
+  interface: CallFlow
+  type: POST
+
+getNodes:
+  interface: Nodes
+  type: GET
+getNodeDetails:
+  interface: Nodes
+  type: GET
+createNodes:
+  interface: Nodes
+  type: POST
+createNodeFull:
+  interface: Nodes
+  type: POST
+updateNodes:
+  interface: Nodes
+  type: PUT
+deleteNodes:
+  interface: Nodes
+  type: DELETE
+
+getLinks:
+  interface: Links
+  type: GET
+createLinks:
+  interface: Links
+  type: POST
+createLinksFull:
+  interface: Links
+  type: POST
+updateLinks:
+  interface: Links
+  type: PUT
+attachVoxnumberToLink:
+  interface: Links
+  type: PUT
+removeVoxnumberFromLink:
+  interface: Links
+  type: PUT
+attachRuleTemplateToLinks:
+  interface: Links
+  type: PUT
+removeRuleTemplateFromLinks:
+  interface: Links
+  type: PUT
+attachCategoryToLink:
+  interface: Links
+  type: PUT
+removeCategoryFromLink:
+  interface: Links
+  type: PUT
+deleteLinks:
+  interface: Links
+  type: DELETE
+
+getCategoryId:
+  interface: Categories
+  type: GET
+getCategories:
+  interface: Categories
+  type: GET
+
+getContacts:
+  interface: Contacts
+  type: GET
+getContactDetails:
+  interface: Contacts
+  type: GET
+createContacts:
+  interface: Contacts
+  type: POST
+updateContacts:
+  interface: Contacts
+  type: PUT
+deleteContacts:
+  interface: Contacts
+  type: DELETE
+
+getRuleTemplates:
+  interface: Rules
+  type: GET
+getVariableRulesOfTemplate:
+  interface: Rules
+  type: GET
+
+getSoundFiles:
+  interface: SoundFiles
+  type: GET
+getSoundFileData:
+  interface: SoundFiles
+  type: GET
+deleteSoundFile:
+  interface: SoundFiles
+  type: DELETE
+uploadSoundFileData:
+  interface: SoundFiles
+  type: POST
+
+getVoxnumbers:
+  interface: Voxnumbers
+  type: GET
+setCallStatus:
+  interface: Voxnumbers
+  type: PUT
+
+initiateCall:
+  interface: Calling
+  type: POST
+
+getCountries:
+  interface: Countries
+  type: GET
+
+createActionKey:
+  interface: JsApi
+  type: POST
+getActionKey:
+  interface: JsApi
+  type: GET
+
+getVoxnumberRegions:
+  interface: Purchase
+  type: GET
+getRegionForNumberType:
+  interface: Purchase
+  type: GET
+getOrderDetails:
+  interface: Purchase
+  type: GET
+purchaseVoxNumbers:
+  interface: Purchase
+  type: POST

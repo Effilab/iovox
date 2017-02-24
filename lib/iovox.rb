@@ -1,5 +1,11 @@
-require "iovox/version"
+# frozen_string_literal: true
+
+require 'pathname'
 
 module Iovox
-  # Your code goes here...
+  class << self
+    attr_reader :root
+  end
+
+  @root = Pathname.new(File.expand_path(File.join('..', '..'), __FILE__))
 end

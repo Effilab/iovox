@@ -1,11 +1,7 @@
-require "spec_helper"
+# frozen_string_literal: true
 
 RSpec.describe Iovox do
-  it "has a version number" do
+  it 'has a version number' do
     expect(Iovox::VERSION).not_to be nil
-  end
-
-  it "does something useful" do
-    expect(false).to eq(true)
   end
 end

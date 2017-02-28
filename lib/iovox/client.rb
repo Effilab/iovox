@@ -9,6 +9,7 @@ require 'iovox/string_inflector'
 require 'iovox/xml'
 require 'iovox/middleware/request'
 require 'iovox/middleware/xml_request'
+require 'iovox/middleware/logger'
 
 class Iovox::Client
   API_VERSION = '3'
@@ -44,7 +45,7 @@ class Iovox::Client
       conn.response :raise_error
 
       if config[:logger]
-        conn.response :logger, config[:logger], bodies: true do |middleware|
+        conn.use Iovox::Middleware::Logger, config[:logger], bodies: true do |middleware|
           middleware.filter(/(secureKey:)(.*)/,'\1 [FILTERED]')
         end
       end

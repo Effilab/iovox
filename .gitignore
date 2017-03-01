@@ -7,9 +7,12 @@
 /pkg/
 /spec/reports/
 /tmp/
+/log/*
+!/log/.keep
 
 # rspec failure tracking
 .rspec_status
 
 .byebug_history
-.rbenv-vars
+.env
+proxy_*.id_rsa

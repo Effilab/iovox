@@ -2,18 +2,63 @@
 # frozen_string_literal: true
 
 require 'bundler/setup'
+require 'dotenv/load'
 require 'awesome_print'
 require 'byebug'
+require 'optparse'
+require 'irb'
+require 'logger'
+
+def extract_options!
+  options = {
+    proxy: false,
+    target: :dev,
+  }
+
+  OptionParser.new do |opts|
+    opts.on('--[no-]proxy', "Proxy TCP sockets, default: #{options[:proxy]}") do |value|
+      options[:proxy] = value
+    end
+
+    opts.on('--target=NAME', "Target name (dev/prod), default: #{options[:target]}") do |value|
+      case value
+      when 'dev', 'prod'
+        options[:target] = value.to_sym
+      else
+        raise ArgumentError, 'Unknown value for --target argument'
+      end
+    end
+  end.parse!
+
+  options
+end
+
+options = extract_options!
+
+case options[:target]
+when :prod
+  ENV['IOVOX_URL']        ||= ENV.fetch('PROD_IOVOX_URL')
+  ENV['IOVOX_USERNAME']   ||= ENV.fetch('PROD_IOVOX_USERNAME')
+  ENV['IOVOX_SECURE_KEY'] ||= ENV.fetch('PROD_IOVOX_SECURE_KEY')
+else
+  ENV['IOVOX_URL']        ||= ENV.fetch('DEV_IOVOX_URL')
+  ENV['IOVOX_USERNAME']   ||= ENV.fetch('DEV_IOVOX_USERNAME')
+  ENV['IOVOX_SECURE_KEY'] ||= ENV.fetch('DEV_IOVOX_SECURE_KEY')
+end
+
+console_wrapper =
+  if options[:proxy]
+    require 'socksify'
+
+    proc { |&block| Socksify.proxy('0.0.0.0', '9999', &block) }
+  else
+    proc { |&block| block.call }
+  end
 
 require 'iovox/client'
 
-# You can add fixtures and/or initialization code here to make experimenting
-# with your gem easier. You can also use a different console, if you like.
+Iovox::Client.configuration[:logger] = Logger.new("log/#{options[:target]}.log")
 
-# (If you use this, don't forget to add pry to your Gemfile!)
-# require 'pry'
-# Pry.start
-
-require 'irb'
-
-IRB.start(__FILE__)
+console_wrapper.call do
+  IRB.start(__FILE__)
+end

@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -o allexport
+source .env
+set +o allexport
+
+if [[ "${1}" = "--prod" ]]
+then
+  PROXY_USER=${PROD_PROXY_USER}
+  PROXY_HOST=${PROD_PROXY_HOST}
+  PROXY_PORT=${PROD_PROXY_PORT}
+  PROXY_KEY=${PROD_PROXY_KEY}
+else
+  PROXY_USER=${DEV_PROXY_USER}
+  PROXY_HOST=${DEV_PROXY_HOST}
+  PROXY_PORT=${DEV_PROXY_PORT}
+  PROXY_KEY=${DEV_PROXY_KEY}
+fi
+
+ssh \
+  -i ${PROXY_KEY} \
+  -p ${PROXY_PORT} \
+  -D 0.0.0.0:9999 \
+  -N \
+  ${PROXY_USER}@${PROXY_HOST}

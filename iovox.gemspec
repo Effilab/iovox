@@ -18,6 +18,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'awesome_print'
   spec.add_development_dependency 'byebug'
   spec.add_development_dependency 'faker'
+  spec.add_development_dependency 'socksify'
+  spec.add_development_dependency 'dotenv'
 
   spec.add_runtime_dependency 'rack'
   spec.add_runtime_dependency 'faraday', '>= 0.9.2'

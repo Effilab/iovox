@@ -12,6 +12,8 @@ require 'iovox/middleware/xml_request'
 require 'iovox/middleware/logger'
 
 class Iovox::Client
+  require 'iovox/client/response'
+
   API_VERSION = '3'
   API_INTERFACES = YAML.load_file(Iovox.root.join('config', 'interfaces.yml'))
 
@@ -66,7 +68,7 @@ class Iovox::Client
       def %{method_name}(query: nil, payload: nil)
         payload = serialize(payload, :%{method_name})
 
-        conn.%{faraday_method_name}('%{iovox_interface_name}') do |req|
+        response = conn.%{faraday_method_name}('%{iovox_interface_name}') do |req|
           req.params[:method] = '%{iovox_method_name}'
 
           if query.is_a?(Hash)
@@ -77,6 +79,8 @@ class Iovox::Client
 
           yield(req) if block_given?
         end
+
+        Iovox::Client::Response.new(response)
       end
     RUBY
 

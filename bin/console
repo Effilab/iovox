@@ -59,6 +59,10 @@ require 'iovox/client'
 
 Iovox::Client.configuration[:logger] = Logger.new("log/#{options[:target]}.log")
 
+if options[:target] == :prod
+  Iovox::Client.configuration[:read_only] = true
+end
+
 console_wrapper.call do
   IRB.start(__FILE__)
 end

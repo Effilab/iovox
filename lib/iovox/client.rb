@@ -27,18 +27,26 @@ class Iovox::Client
       username:   ENV['IOVOX_USERNAME'],
       secure_key: ENV['IOVOX_SECURE_KEY'],
     },
-    logger: false,
+    logger: nil,
+    read_only: false,
   }
 
   attr_reader :conn
 
   def initialize(config = self.class.configuration)
     @conn = establish_connection(config)
+    @read_only = config.fetch(:read_only, false)
   end
 
+  def read_only?
+    @read_only
+  end
+
+  attr_writer :read_only
+
   def establish_connection(config)
-    url = config[:url].to_s
-    iovox_request_opts = config[:credentials].merge(output: 'XML', version: API_VERSION)
+    url = config.fetch(:url).to_s
+    iovox_request_opts = config.fetch(:credentials).merge(output: 'XML', version: API_VERSION)
 
     Faraday.new(url: url) do |conn|
       conn.use Iovox::Middleware::Request, iovox_request_opts
@@ -59,13 +67,19 @@ class Iovox::Client
   API_INTERFACES.each do |iovox_method_name, config|
     definition_params = {
       method_name: Iovox::StringInflector.underscore(iovox_method_name),
+      http_method: config['type'].upcase,
       faraday_method_name: config['type'].downcase,
       iovox_method_name: iovox_method_name,
       iovox_interface_name: config['interface'],
     }
 
     definition = format(<<~RUBY, definition_params)
-      def %{method_name}(query: nil, payload: nil)
+      def %{method_name}(query: nil, payload: nil, q: nil, p: nil)
+        authorize_http_method(:%{http_method})
+
+        query ||= q
+        payload ||= p
+
         payload = serialize(payload, :%{method_name})
 
         response = conn.%{faraday_method_name}('%{iovox_interface_name}') do |req|
@@ -88,6 +102,18 @@ class Iovox::Client
   end
 
   private
+
+  def http_method_safe?(http_method)
+    return true unless read_only?
+
+    http_method == :GET
+  end
+
+  def authorize_http_method(http_method)
+    return if http_method_safe?(http_method)
+
+    raise "Rejected unsafe HTTP #{http_method} method"
+  end
 
   def serialize(payload, method_name)
     return payload unless (

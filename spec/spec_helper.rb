@@ -1,5 +1,12 @@
+# frozen_string_literal: true
+
 require 'bundler/setup'
-require 'iovox'
+require 'dotenv/load'
+require 'byebug'
+require 'awesome_print'
+
+require_relative 'support/client'
+require_relative 'support/sandbox_proxy'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

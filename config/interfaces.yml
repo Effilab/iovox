@@ -118,6 +118,9 @@ getVoxnumbers:
 setCallStatus:
   interface: Voxnumbers
   type: PUT
+deleteVoxnumbersFromAccount:
+  interface: Voxnumbers
+  type: DELETE
 
 initiateCall:
   interface: Calling

@@ -55,13 +55,15 @@ console_wrapper =
     proc { |&block| block.call }
   end
 
-require 'iovox/client'
+require 'iovox/all'
 
 Iovox::Client.configuration[:logger] = Logger.new("log/#{options[:target]}.log")
 
 if options[:target] == :prod
   Iovox::Client.configuration[:read_only] = true
 end
+
+Iovox::Interface.client = Iovox::Client.new
 
 console_wrapper.call do
   IRB.start(__FILE__)

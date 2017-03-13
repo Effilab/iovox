@@ -16,3 +16,5 @@
 .byebug_history
 .env
 proxy_*.id_rsa
+dump.marshal
+dump.yaml

@@ -65,6 +65,21 @@ end
 
 Iovox::Interface.client = Iovox::Client.new
 
+def restore_dump(max: 700)
+  load 'lib/iovox/dump.rb'
+
+  registry = Iovox::InterfaceRegistry.new(Iovox::Client.new)
+
+  dump = Iovox::Dump::Dump.new(registry)
+  restore = Iovox::Dump::Restore.new(registry)
+
+  nodes = dump.load_raw
+
+  restore.call(nodes, max: max)
+
+  nil
+end
+
 console_wrapper.call do
   IRB.start(__FILE__)
 end

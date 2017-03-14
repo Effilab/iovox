@@ -51,8 +51,8 @@ class Iovox::Client
     Faraday.new(url: url) do |conn|
       conn.use Iovox::Middleware::Request, iovox_request_opts
       conn.use Iovox::Middleware::XmlRequest
-      conn.response :xml, :content_type => /\bxml$/
       conn.response :raise_error
+      conn.response :xml, :content_type => /\bxml$/
 
       if config[:logger]
         conn.use Iovox::Middleware::Logger, config[:logger], bodies: true do |middleware|

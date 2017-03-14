@@ -10,6 +10,7 @@ require 'iovox/xml'
 require 'iovox/middleware/request'
 require 'iovox/middleware/xml_request'
 require 'iovox/middleware/logger'
+require 'iovox/middleware/encoder'
 
 class Iovox::Client
   require 'iovox/client/response'
@@ -59,6 +60,8 @@ class Iovox::Client
           middleware.filter(/(secureKey:)(.*)/,'\1 [FILTERED]')
         end
       end
+
+      conn.use Iovox::Middleware::Encoder
 
       conn.adapter Faraday.default_adapter
     end

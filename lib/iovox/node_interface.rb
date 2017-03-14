@@ -13,7 +13,7 @@ module Iovox
 
       result = client.get_nodes(query: query).result
 
-      load_any(result)
+      result && load_any(result)
     end
 
     def create(node_or_nodes)

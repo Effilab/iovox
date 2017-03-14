@@ -30,7 +30,7 @@ module Iovox
         Link.from_params(link_params, node: node)
       end
 
-      if params.key?('link_id')
+      if params['link_id']
         links << Link.from_params(params, node: node)
       end
 

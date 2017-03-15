@@ -160,7 +160,9 @@ module Iovox
         node_ids &&= node_ids.map { |r| r['node_id'] }.uniq
 
         if node_ids && !node_ids.empty?
-          registry.client.delete_nodes(query: { node_ids: node_ids.join(',') })
+          Threader.new.concurrent(node_ids) do |node_ids|
+            registry.client.delete_nodes(query: { node_ids: node_ids.join(',') })
+          end
         end
       end
 
@@ -169,7 +171,9 @@ module Iovox
         contact_ids &&= contact_ids.select { |r| r['contact_id'] && r['assigned_status'] == 'UNASSIGNED' }.map { |r| r['contact_id'] }.uniq
 
         if contact_ids && !contact_ids.empty?
-          registry.client.delete_contacts(query: { contact_ids: contact_ids.join(',') })
+          Threader.new.concurrent(contact_ids) do |contact_ids|
+            registry.client.delete_contacts(query: { contact_ids: contact_ids.join(',') })
+          end
         end
       end
     end

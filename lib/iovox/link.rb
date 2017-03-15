@@ -70,6 +70,13 @@ module Iovox
         end
       end
 
+      if voxnumber
+        params[:assign_voxnumber] = {
+          method: 'BY VOXNUMBER',
+          full_voxnumber: voxnumber,
+        }
+      end
+
       params
     end
   end

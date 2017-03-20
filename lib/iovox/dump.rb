@@ -113,41 +113,22 @@ module Iovox
           .result
           .map { |result| result['voxnumber'] }
 
-        threader = Threader.new
-
-        threader.each(nodes) do |node|
-          node.links.each do |link|
-            begin
-              voxnumber = threader.synchronize { voxnumbers.pop }
-
-              next unless voxnumber
-
-              registry[:link].attach_voxnumber(link.id, by_voxnumber: voxnumber)
-            rescue => error
-              threader.synchronize { p(error) }
-            end
-          end
+        nodes.map do |node|
+          node.merge(links: node.links&.map { |link| link.merge(voxnumber: voxnumbers.pop) })
         end
       end
 
-      def call(nodes, max: 10)
+      def call(nodes, max: 10, keep_voxnumbers: false)
         clean
 
-        if max
-          nodes = nodes.take(max)
-        end
-
-        nodes = nodes.map do |node|
-          node.merge(links: node.links&.map { |link| link.merge(voxnumber: nil) })
-        end
+        nodes = nodes.take(max) if max
+        nodes = assign_voxnumbers(nodes) unless keep_voxnumbers
 
         threader = Threader.new
 
         threader.each(nodes) do |node|
           registry[:node_full].create(node)
         end
-
-        assign_voxnumbers(nodes)
       end
 
       def clean

@@ -4,7 +4,7 @@ require 'socksify'
 
 module SandboxProxy
   def self.included(base)
-    return if ENV.key?('NO_SANDBOX_PROXY')
+    return if ENV['TEST_PROXY'] == '0'
 
     base.around(:each) do |example|
       Socksify.proxy('0.0.0.0', '9999') do
@@ -15,5 +15,5 @@ module SandboxProxy
 end
 
 RSpec.configure do |config|
-  config.include(SandboxProxy, sandbox_proxy: true)
+  config.include(SandboxProxy, proxy: true)
 end

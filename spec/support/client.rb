@@ -8,6 +8,12 @@ require 'iovox/client'
 Iovox::Client.configuration[:logger] = Logger.new('log/test.log')
 
 class Iovox::Client::TestCleaner
+  class << self
+    def instance
+      @instance ||= new
+    end
+  end
+
   attr_reader :client
 
   def initialize
@@ -15,7 +21,7 @@ class Iovox::Client::TestCleaner
   end
 
   def call
-    if (nodes = client.get_nodes.result)
+    if (nodes = client.get_nodes(query: { req_fields: 'nid' }).result)
       node_ids =
         nodes
           .select { |node| node['node_id']&.start_with?('test/') }
@@ -24,7 +30,7 @@ class Iovox::Client::TestCleaner
       client.delete_nodes(query: { node_ids: node_ids.join(',') }) unless node_ids.empty?
     end
 
-    if (contacts = client.get_contacts.result)
+    if (contacts = client.get_contacts(query: { req_fields: 'cid' }).result)
       contact_ids =
         contacts
           .select { |contact| contact['contact_id']&.start_with?('test/') }
@@ -36,7 +42,7 @@ class Iovox::Client::TestCleaner
 end
 
 RSpec.configure do |config|
-  config.after(:all) do
-    Iovox::Client::TestCleaner.new.call
+  config.after(:each) do |example|
+    Iovox::Client::TestCleaner.instance.call if example.metadata[:clean]
   end
 end

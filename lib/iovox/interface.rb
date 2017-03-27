@@ -2,41 +2,40 @@
 
 module Iovox
   class Interface
-    class << self
-      def client
-        @client || default_client
-      end
-
-      attr_writer :client
-
+    module RegistryOwner
       def registry
         @registry || default_registry
       end
 
-      def default_client
-        Interface.instance_variable_get(:@client)
+      attr_writer :registry
+
+      def client
+        registry&.client
       end
+    end
+
+    class << self
+      include RegistryOwner
+
+      private
 
       def default_registry
-        Interface.instance_variable_get(:@registry)
+        superclass.respond_to?(:registry) ? superclass.registry : nil
       end
     end
 
-    def initialize(client = nil, registry = nil)
-      @client = client if client
-      @registry = registry if registry
+    include RegistryOwner
+
+    # TODO: when initializing a interface without providing a registry, initialize a dedicated
+    # registry and do not use the one from the class ?
+    def initialize(registry = nil)
+      @registry = registry
     end
 
-    def client
-      @client || self.class.client
+    private
+
+    def default_registry
+      self.class.registry
     end
-
-    attr_writer :client
-
-    def registry
-      @registry || self.class.registry
-    end
-
-    attr_writer :registry
   end
 end

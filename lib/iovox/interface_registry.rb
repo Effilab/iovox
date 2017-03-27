@@ -15,36 +15,16 @@ class Iovox::InterfaceRegistry
     key = key.to_s
 
     @mutex.synchronize do
-      @map.fetch(key) do
-        @map[key] = send(key)
-      end
-    end
-  end
-
-  def []=(key, value)
-    key = key.to_s
-
-    @mutex.synchronize do
-      @map[key] = value
+      @map[key] ||= interface_for(key)
     end
   end
 
   private
 
-  def node
-    Iovox::NodeInterface.new(client, self)
-  end
+  def interface_for(entity_name)
+    interface_name = "#{Iovox::StringInflector.camel_case(entity_name)}Interface"
 
-  def link
-    Iovox::LinkInterface.new(client, self)
-  end
-
-  def node_full
-    Iovox::NodeFullInterface.new(client, self)
-  end
-
-  def call_rule_template
-    Iovox::CallRuleTemplateInterface.new(client, self)
+    Iovox.const_get(interface_name).new(self)
   end
 end
 

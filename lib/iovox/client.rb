@@ -69,7 +69,7 @@ class Iovox::Client
 
   API_INTERFACES.each do |iovox_method_name, config|
     definition_params = {
-      method_name: Iovox::StringInflector.underscore(iovox_method_name),
+      method_name: Iovox::StringInflector.snake_case(iovox_method_name),
       http_method: config['type'].upcase,
       faraday_method_name: config['type'].downcase,
       iovox_method_name: iovox_method_name,

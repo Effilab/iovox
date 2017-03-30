@@ -37,5 +37,16 @@ module Iovox
     def default_registry
       self.class.registry
     end
+
+    def array_wrap(value)
+      case value
+      when Array
+        value
+      when nil
+        []
+      else
+        [value]
+      end
+    end
   end
 end

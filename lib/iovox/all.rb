@@ -2,7 +2,6 @@
 
 require 'iovox/client'
 require 'iovox/node_interface'
-require 'iovox/node_full_interface'
 require 'iovox/link_interface'
 require 'iovox/contact_interface'
 require 'iovox/call_rule_template_interface'

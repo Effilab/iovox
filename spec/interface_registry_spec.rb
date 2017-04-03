@@ -41,12 +41,11 @@ RSpec.describe Iovox::InterfaceRegistry do
     it 'provides instances of interfaces' do
       expect(registry[:node]).to be_a(Iovox::NodeInterface)
       expect(registry[:link]).to be_a(Iovox::LinkInterface)
-      expect(registry[:node_full]).to be_a(Iovox::NodeFullInterface)
       expect(registry[:call_rule_template]).to be_a(Iovox::CallRuleTemplateInterface)
     end
 
     it 'shares itself with the instances' do
-      expect(registry[:node_full].registry).to be(registry)
+      expect(registry[:node].registry).to be(registry)
     end
   end
 end

@@ -6,87 +6,105 @@ require 'iovox/link'
 
 module Iovox
   class NodeInterface < Interface
-    def get(node_id, link_id = nil)
-      query = { node_id: node_id }
+    def get(node_id, link_id: nil)
+      common_get(node_id, link_id) do |query|
+        client.get_nodes(query: query)
+      end
+    end
 
-      query[:link_id] = link_id if link_id
+    def get_full(node_id, link_id: nil)
+      common_get(node_id, link_id) do |query|
+        client.get_node_details(query: query)
+      end
+    end
 
-      result = client.get_nodes(query: query).result
+    def where(query = {})
+      response =
+        if query.empty?
+          client.get_nodes
+        else
+          client.get_nodes(query: query)
+        end
 
-      result && load_any(result)
+      load_many(array_wrap(response.result))
     end
 
     def create(node_or_nodes)
-      if !node_or_nodes.is_a?(Array)
-        node_or_nodes = [node_or_nodes]
-      end
+      create_many(array_wrap(node_or_nodes))
 
-      create_many(node_or_nodes)
+      nil
+    end
+
+    def create_full(node)
+      request = { node: node.to_params }
+
+      client.create_node_full(payload: { request: request })
 
       nil
     end
 
     def update(node_id, params)
-      node_payload = params.each_with_object({
-        node_id: node_id
-      }) do |(key, value), acc|
-        key = key.to_sym
+      request = {
+        node: parameterize(params, update: true).merge(node_id: node_id)
+      }
 
-        case key
-        when :id, :node_id then acc[:new_node_id] = value
-        when :name         then acc[:node_name] = value
-        when :type         then acc[:node_type] = value
-        else
-          acc[key] = value
-        end
-      end
-
-      client.update_nodes(payload: {
-        request: {
-          node: node_payload,
-        },
-      })
+      client.update_nodes(payload: { request: request })
 
       nil
     end
 
     private
 
-    def load_any(result)
-      case result
-      when Hash  then load_single(result)
-      when Array then load_many(result)
-      else raise
-      end
-    end
+    def common_get(node_id, link_id)
+      query = { node_id: node_id }
 
-    def load_single(result)
-      Node.from_params(result)
+      query[:link_id] = link_id if link_id
+
+      result = yield(query).result
+
+      result && Node.from_params(result)
     end
 
     def load_many(results)
-      first = results.shift
-
-      node = load_single(first)
+      memo = {}
 
       results.each do |result|
-        node.links << Link.from_params(result, node: node)
+        node_id = result['node_id']
+
+        if memo.key?(node_id)
+          memo[node_id].links << Link.from_params(result, node: memo[node_id])
+        else
+          memo[node_id] = Node.from_params(result)
+        end
       end
 
-      node
+      memo.values
+    end
+
+    def parameterize(params, update: false)
+      params.each_with_object({}) do |(key, value), acc|
+        key = key.to_sym
+
+        case key
+        when :name then acc[:node_name] = value
+        when :type then acc[:node_type] = value
+        when :id, :node_id
+          if update
+            acc[:new_node_id] = value
+          else
+            acc[:node_id] = value
+          end
+        else
+          acc[key] = value
+        end
+      end
     end
 
     def create_many(nodes)
       return if nodes.empty?
 
       request = nodes.map do |node|
-        {
-          node: {
-            node_id: node[:id],
-            node_name: node[:name],
-            node_type: node[:type],
-          },
-        }
+        { node: parameterize(params, update: false) }
       end
 
       client.create_nodes(payload: { request: request })

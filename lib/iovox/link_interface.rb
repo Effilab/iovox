@@ -61,13 +61,13 @@ module Iovox
     end
 
     def attach_voxnumber(link_id, opts)
-      method, args = opts.first
+      method, arg = opts.first
 
       case method
       when :by_voxnumber
-        attach_voxnumber_by_voxnumber(link_id, *args)
+        attach_voxnumber_by_voxnumber(link_id, arg)
       when :by_postcode
-        attach_voxnumber_by_postcode(link_id, *args)
+        attach_voxnumber_by_postcode(link_id, arg)
       else
         raise NoMethodError, "Cannot attach voxnumber #{method}"
       end

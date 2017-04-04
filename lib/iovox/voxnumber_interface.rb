@@ -16,6 +16,10 @@ module Iovox
       end
     end
 
+    def find_by(query)
+      where(query).first
+    end
+
     def where(query = {})
       query[:req_fields] ||= 'nid,nname,lid,lname,as,cs,cc,vn,vnt,vnco,vnci,vnpd'
 

@@ -9,31 +9,25 @@ require 'optparse'
 require 'irb'
 require 'logger'
 
-def extract_options!
-  options = {
-    proxy: false,
-    target: :dev,
-  }
+options = {
+  proxy: false,
+  target: :dev,
+}
 
-  OptionParser.new do |opts|
-    opts.on('--[no-]proxy', "Proxy TCP sockets, default: #{options[:proxy]}") do |value|
-      options[:proxy] = value
+OptionParser.new do |opts|
+  opts.on('--[no-]proxy', "Proxy TCP sockets, default: #{options[:proxy]}") do |value|
+    options[:proxy] = value
+  end
+
+  opts.on('--target=NAME', "Target name (dev/prod), default: #{options[:target]}") do |value|
+    case value
+    when 'dev', 'prod'
+      options[:target] = value.to_sym
+    else
+      raise ArgumentError, 'Unknown value for --target argument'
     end
-
-    opts.on('--target=NAME', "Target name (dev/prod), default: #{options[:target]}") do |value|
-      case value
-      when 'dev', 'prod'
-        options[:target] = value.to_sym
-      else
-        raise ArgumentError, 'Unknown value for --target argument'
-      end
-    end
-  end.parse!
-
-  options
-end
-
-options = extract_options!
+  end
+end.parse!
 
 case options[:target]
 when :prod
@@ -57,7 +51,7 @@ console_wrapper =
 
 require 'iovox/all'
 
-Iovox::Client.configuration[:logger] = Logger.new("log/#{options[:target]}.log")
+Iovox::Client.configuration[:logger] = Logger.new(File.join('log', "#{options[:target]}.log"))
 
 if options[:target] == :prod
   Iovox::Client.configuration[:read_only] = true

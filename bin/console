@@ -40,23 +40,30 @@ else
   ENV['IOVOX_SECURE_KEY'] ||= ENV.fetch('DEV_IOVOX_SECURE_KEY')
 end
 
-console_wrapper =
-  if options[:proxy]
-    require 'socksify'
-
-    proc { |&block| Socksify.proxy('0.0.0.0', '9999', &block) }
+if options[:proxy]
+  case options[:target]
+  when :prod
+    ENV['LOCAL_PROXY_SERVER'] ||= ENV['PROD_LOCAL_PROXY_SERVER']
+    ENV['LOCAL_PROXY_PORT'] ||= ENV['PROD_LOCAL_PROXY_PORT']
   else
-    proc { |&block| block.call }
+    ENV['LOCAL_PROXY_SERVER'] ||= ENV['DEV_LOCAL_PROXY_SERVER']
+    ENV['LOCAL_PROXY_PORT'] ||= ENV['DEV_LOCAL_PROXY_PORT']
   end
+end
 
 require 'iovox/all'
 
 Iovox::Client.configuration[:logger] = Logger.new(File.join('log', "#{options[:target]}.log"))
 
+if options[:proxy]
+  Iovox::Client.configuration[:socks_proxy] = {
+    server: ENV['LOCAL_PROXY_SERVER'],
+    port: ENV['LOCAL_PROXY_PORT'],
+  }
+end
+
 if options[:target] == :prod
   Iovox::Client.configuration[:read_only] = true
 end
 
-console_wrapper.call do
-  IRB.start(__FILE__)
-end
+IRB.start(__FILE__)

@@ -30,6 +30,7 @@ class Iovox::Client
     },
     logger: nil,
     read_only: false,
+    socks_proxy: nil,
   }
 
   attr_reader :conn
@@ -49,6 +50,12 @@ class Iovox::Client
     url = config.fetch(:url).to_s
     iovox_request_opts = config.fetch(:credentials).merge(output: 'XML', version: API_VERSION)
 
+    if config[:socks_proxy]
+      require 'iovox/middleware/net_http_socks_adapter'
+
+      socks_server, socks_port = config[:socks_proxy].values_at(:server, :port)
+    end
+
     Faraday.new(url: url) do |conn|
       conn.use Iovox::Middleware::Request, iovox_request_opts
       conn.use Iovox::Middleware::XmlRequest
@@ -63,7 +70,14 @@ class Iovox::Client
 
       conn.use Iovox::Middleware::Encoder
 
-      conn.adapter Faraday.default_adapter
+      if socks_server && socks_port
+        conn.use Iovox::Middleware::NetHTTPSOCKSAdapter do |http|
+          http.socks_server = socks_server
+          http.socks_port = socks_port
+        end
+      else
+        conn.adapter Faraday.default_adapter
+      end
     end
   end
 

@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 require 'forwardable'
-require 'iovox/client'
+require 'faraday'
+require 'iovox/client' unless defined?(Iovox::Client)
 
 class Iovox::Client::Response
   extend Forwardable

@@ -6,7 +6,6 @@ require 'faraday_middleware'
 
 require 'iovox'
 require 'iovox/string_inflector'
-require 'iovox/xml'
 require 'iovox/middleware/request'
 require 'iovox/middleware/xml_request'
 require 'iovox/middleware/logger'
@@ -97,8 +96,6 @@ class Iovox::Client
         query ||= q
         payload ||= p
 
-        payload = serialize(payload, :%{method_name})
-
         response = conn.%{faraday_method_name}('%{iovox_interface_name}') do |req|
           req.params[:method] = '%{iovox_method_name}'
 
@@ -130,13 +127,5 @@ class Iovox::Client
     return if http_method_safe?(http_method)
 
     raise "Rejected unsafe HTTP #{http_method} method"
-  end
-
-  def serialize(payload, method_name)
-    return payload unless (
-      payload.is_a?(Hash) && Iovox::XML.respond_to?(method_name)
-    )
-
-    Iovox::XML.public_send(method_name, payload)
   end
 end

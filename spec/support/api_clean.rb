@@ -1,16 +1,13 @@
-ENV['IOVOX_URL']        ||= ENV.fetch('DEV_IOVOX_URL')
-ENV['IOVOX_USERNAME']   ||= ENV.fetch('DEV_IOVOX_USERNAME')
-ENV['IOVOX_SECURE_KEY'] ||= ENV.fetch('DEV_IOVOX_SECURE_KEY')
+# frozen_string_literal: true
 
-require 'logger'
-require 'iovox/client'
-
-Iovox::Client.configuration[:logger] = Logger.new('log/test.log')
-
-class Iovox::Client::TestCleaner
+api_cleaner = Class.new do
   class << self
     def instance
       @instance ||= new
+    end
+
+    def call
+      instance.call
     end
   end
 
@@ -42,7 +39,7 @@ class Iovox::Client::TestCleaner
 end
 
 RSpec.configure do |config|
-  config.after(:each) do |example|
-    Iovox::Client::TestCleaner.instance.call if example.metadata[:clean]
+  config.after(:example, :api_clean) do |example|
+    api_cleaner.call
   end
 end

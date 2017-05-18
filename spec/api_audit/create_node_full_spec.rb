@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'createNodeFull', api: true, proxy: true, clean: true do
+RSpec.describe 'createNodeFull', :api_audit, :api_clean do
   let(:client) do
     Iovox::Client.new
   end

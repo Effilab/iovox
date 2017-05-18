@@ -6,5 +6,9 @@ require 'byebug'
 require 'iovox/kernel'
 Iovox::Kernel.require 'awesome_print', verbose: false
 
-require_relative 'support/client'
-require_relative 'support/sandbox_proxy'
+RSpec.configure do |config|
+  config.when_first_matching_example_defined(:api, :api_audit) do
+    require_relative 'support/api_common'
+    require_relative 'support/api_clean'
+  end
+end

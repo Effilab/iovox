@@ -2,7 +2,7 @@
 
 require 'iovox/contact_interface'
 
-RSpec.describe Iovox::ContactInterface, clean: true do
+RSpec.describe Iovox::ContactInterface, :api, :api_clean do
   let(:registry) do
     double(client: Iovox::Client.new)
   end
@@ -34,7 +34,7 @@ RSpec.describe Iovox::ContactInterface, clean: true do
       mk_contact(id: 'test/foo', display_name: 'test/foo')
     end
 
-    before(:each) do
+    before(:example) do
       create_contact_raw(contact.to_params)
     end
 
@@ -60,7 +60,7 @@ RSpec.describe Iovox::ContactInterface, clean: true do
       mk_contact(id: 'test/foo', display_name: 'test/foo')
     end
 
-    before(:each) do
+    before(:example) do
       create_contact_raw(contact.to_params)
     end
 
@@ -80,7 +80,7 @@ RSpec.describe Iovox::ContactInterface, clean: true do
       mk_contact(id: 'test/foo', display_name: 'test/foo')
     end
 
-    before(:each) do
+    before(:example) do
       create_contact_raw(contact.to_params)
     end
 

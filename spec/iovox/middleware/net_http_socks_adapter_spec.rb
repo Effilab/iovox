@@ -12,7 +12,7 @@ RSpec.describe 'Iovox::Middleware::NetHTTPSOCKSAdapter', order: :defined do
       $LOAD_PATH.insert(library_path_index + 1, library_path)
     end
 
-    before(:each) do
+    before(:example) do
       if defined?(Iovox::Middleware::NetHTTPSOCKSAdapter)
         skip('library has already been loaded, skipping not applicable example')
       end

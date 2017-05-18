@@ -4,7 +4,7 @@ module Iovox
   class Interface
     module RegistryOwner
       def registry
-        @registry || default_registry
+        (defined?(@registry) && @registry) || default_registry
       end
 
       attr_writer :registry

@@ -8,7 +8,7 @@ require 'logger'
 require 'iovox/client'
 
 client_config = {}
-client_config[:logger] = Logger.new('log/test.log')
+client_config[:logger] = Iovox::Logger.new('log/test.log')
 
 if ENV['TEST_PROXY'] == '1'
   client_config[:socks_proxy] = {

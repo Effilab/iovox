@@ -7,7 +7,6 @@ require 'awesome_print'
 require 'byebug'
 require 'optparse'
 require 'irb'
-require 'logger'
 
 options = {
   proxy: false,
@@ -53,7 +52,9 @@ end
 
 require 'iovox/all'
 
-Iovox::Client.configuration[:logger] = Logger.new(File.join('log', "#{options[:target]}.log"))
+Iovox::Client.configuration[:logger] = Iovox::Logger.new(
+  File.join('log', "#{options[:target]}.log")
+)
 
 if options[:proxy]
   Iovox::Client.configuration[:socks_proxy] = {

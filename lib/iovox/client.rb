@@ -9,6 +9,7 @@ require 'iovox/string_inflector'
 require 'iovox/middleware/request'
 require 'iovox/middleware/xml_request'
 require 'iovox/middleware/encoder'
+require 'iovox/logger'
 
 class Iovox::Client
   require 'iovox/client/response'
@@ -31,9 +32,13 @@ class Iovox::Client
     socks_proxy: nil,
   }
 
-  attr_reader :conn
+  attr_reader :conn, :logger
 
   def initialize(config = self.class.configuration)
+    if config[:logger]
+      @logger = config[:logger] == true ? default_logger : config[:logger]
+    end
+
     @conn = establish_connection(config)
     @read_only = config.fetch(:read_only, false)
   end
@@ -61,7 +66,7 @@ class Iovox::Client
       conn.response :xml, :content_type => /\bxml$/
 
       if config[:logger]
-        conn.response :logger, config[:logger], bodies: true do |middleware|
+        conn.response :logger, logger, bodies: true do |middleware|
           middleware.filter(/(secureKey:)(.*)/,'\1 [FILTERED]')
         end
       end
@@ -115,6 +120,10 @@ class Iovox::Client
   end
 
   private
+
+  def default_logger
+    Iovox::Logger.new(STDOUT)
+  end
 
   def http_method_safe?(http_method)
     return true unless read_only?

@@ -5,6 +5,7 @@ require 'faraday'
 require 'faraday_middleware'
 
 require 'iovox'
+require 'iovox/configuration'
 require 'iovox/string_inflector'
 require 'iovox/middleware/request'
 require 'iovox/middleware/xml_request'
@@ -19,19 +20,27 @@ class Iovox::Client
   API_INTERFACES = YAML.load_file(Iovox.root.join('config', 'interfaces.yml'))
 
   class << self
-    attr_accessor :configuration
+    def configuration
+      @configuration || load_configuration
+    end
+
+    private
+
+    attr_reader :config_mutex
+
+    def load_ivars
+      @config_mutex = Mutex.new
+      @configuration = nil
+    end
+
+    def load_configuration
+      config_mutex.synchronize do
+        @configuration ||= Iovox::Configuration.defaults
+      end
+    end
   end
 
-  @configuration = {
-    url: ENV.fetch('IOVOX_URL', 'https://api.iovox.com:444'),
-    credentials: {
-      username:   ENV['IOVOX_USERNAME'],
-      secure_key: ENV['IOVOX_SECURE_KEY'],
-    },
-    logger: nil,
-    read_only: false,
-    socks_proxy: nil,
-  }
+  load_ivars
 
   attr_reader :conn, :logger
 

@@ -18,6 +18,15 @@ api_cleaner = Class.new do
   end
 
   def call
+    cleaners = []
+    cleaners << Thread.new { clean_nodes }
+    cleaners << Thread.new { clean_contacts }
+    cleaners.each(&:join)
+  end
+
+  private
+
+  def clean_nodes
     if (nodes = client.get_nodes(query: { req_fields: 'nid' }).result)
       node_ids =
         nodes
@@ -26,7 +35,9 @@ api_cleaner = Class.new do
 
       client.delete_nodes(query: { node_ids: node_ids.join(',') }) unless node_ids.empty?
     end
+  end
 
+  def clean_contacts
     if (contacts = client.get_contacts(query: { req_fields: 'cid' }).result)
       contact_ids =
         contacts

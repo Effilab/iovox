@@ -9,6 +9,7 @@ require 'iovox/string_inflector'
 require 'iovox/middleware/request'
 require 'iovox/middleware/xml_request'
 require 'iovox/middleware/encoder'
+require 'iovox/middleware/read_only'
 require 'iovox/logger'
 
 class Iovox::Client
@@ -39,15 +40,14 @@ class Iovox::Client
       @logger = config[:logger] == true ? default_logger : config[:logger]
     end
 
-    @conn = establish_connection(config)
     @read_only = config.fetch(:read_only, false)
+
+    @conn = establish_connection(config)
   end
 
   def read_only?
     @read_only
   end
-
-  attr_writer :read_only
 
   def establish_connection(config)
     url = config.fetch(:url).to_s
@@ -60,6 +60,7 @@ class Iovox::Client
     end
 
     Faraday.new(url: url) do |conn|
+      conn.use Iovox::Middleware::ReadOnly if read_only?
       conn.use Iovox::Middleware::Request, iovox_request_opts
       conn.use Iovox::Middleware::XmlRequest
       conn.response :raise_error
@@ -95,8 +96,6 @@ class Iovox::Client
 
     definition = format(<<~RUBY, definition_params)
       def %{method_name}(query: nil, payload: nil, q: nil, p: nil)
-        authorize_http_method(:%{http_method})
-
         query ||= q
         payload ||= p
 
@@ -123,17 +122,5 @@ class Iovox::Client
 
   def default_logger
     Iovox::Logger.new(STDOUT)
-  end
-
-  def http_method_safe?(http_method)
-    return true unless read_only?
-
-    http_method == :GET
-  end
-
-  def authorize_http_method(http_method)
-    return if http_method_safe?(http_method)
-
-    raise "Rejected unsafe HTTP #{http_method} method"
   end
 end

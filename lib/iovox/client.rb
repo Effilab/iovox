@@ -35,7 +35,9 @@ class Iovox::Client
 
   attr_reader :conn, :logger
 
-  def initialize(config = self.class.configuration)
+  def initialize(config = self.class.configuration, **args)
+    config = config.merge(args) unless args.empty?
+
     if config[:logger]
       @logger = config[:logger] == true ? default_logger : config[:logger]
     end

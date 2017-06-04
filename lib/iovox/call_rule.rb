@@ -18,7 +18,7 @@ module Iovox
         type: params['rule_type'],
         label: params['rule_label'],
         record_call: params['record_call'],
-        send_call_alart: params['send_call_alert'],
+        send_call_alert: params['send_call_alert'],
         contact: Contact.from_params(params['contact'])
       )
     end

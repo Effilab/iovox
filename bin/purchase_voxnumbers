@@ -1,0 +1,92 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'bundler/setup'
+require 'dotenv/load'
+require 'iovox/cli'
+
+options = {
+  count: 10,
+  country_code: '33',
+  number_type: 'GEOGRAPHIC',
+}
+
+Iovox::Cli::Parser.new do |opts|
+  opts.on('--count=COUNT', "Number of voxnumbers to purchase, default: #{options[:count]}") do |value|
+    options[:count] = Integer(value)
+  end
+
+  opts.on('--country-code=CODE', "Country code of the voxnumbers to purchase, default: #{options[:country_code]}") do |value|
+    options[:country_code] = value
+  end
+
+  opts.on('--number-type=TYPE', "Number type of the voxnumbers to purchase, default: #{options[:number_type]}") do |value|
+    options[:number_type] = value
+  end
+end.call
+
+client = Iovox::Client.new
+
+regions = client.get_voxnumber_regions(query: {
+  country_code: options[:country_code],
+  number_type: options[:number_type],
+}).result
+
+additional_information = {
+  firstname: 'N/A',
+  lastname: 'N/A',
+  company: 'N/A',
+  street: 'N/A',
+  building_number: '1',
+  city: 'N/A',
+  zipcode: 'N/A',
+}
+
+items = Array.new(options[:count]) do
+  region = regions.sample
+
+  item = {
+    quantity: 1,
+    country_code: region['country_code'],
+    area_code: region['area_code'],
+    city_name: region['city_name'],
+    number_type: options[:number_type],
+    additional_information: additional_information,
+  }
+
+  { item: item }
+end
+
+puts "Requesting voxnumbers purchase with options #{options}"
+puts "Purchase summary:"
+
+items.group_by { |item| item[:item][:city_name] }.sort_by(&:first).each do |city_name, list|
+  puts "  #{city_name} => #{list.size}"
+end
+
+start_at = Time.now
+waiter = -> { Time.now - start_at }
+last_wait_time = 0
+
+req_thread = Thread.new do
+  client.purchase_vox_numbers(payload: {
+    request: {
+      items: items,
+    },
+  }) { |req| req.options.timeout = 3600 }
+end
+
+req_thread.abort_on_exception = true
+
+loop do
+  break unless req_thread.alive?
+
+  sleep 0.5
+
+  if ((wait_time = waiter.call) - last_wait_time) > 5
+    puts "Waiting for request to complete (wait time: #{wait_time.to_i} seconds)"
+    last_wait_time = wait_time
+  end
+end
+
+puts "Completed in #{waiter.call} seconds"

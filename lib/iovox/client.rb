@@ -11,6 +11,7 @@ require 'iovox/middleware/request'
 require 'iovox/middleware/xml_request'
 require 'iovox/middleware/encoder'
 require 'iovox/middleware/read_only'
+require 'iovox/middleware/raise_error'
 require 'iovox/logger'
 
 class Iovox::Client
@@ -74,12 +75,12 @@ class Iovox::Client
       conn.use Iovox::Middleware::ReadOnly if read_only?
       conn.use Iovox::Middleware::Request, iovox_request_opts
       conn.use Iovox::Middleware::XmlRequest
-      conn.response :raise_error
+      conn.use Iovox::Middleware::RaiseError
       conn.response :xml, :content_type => /\bxml$/
 
       if config[:logger]
         conn.response :logger, logger, bodies: true do |middleware|
-          middleware.filter(/(secureKey:)(.*)/,'\1 [FILTERED]')
+          middleware.filter(/(secureKey:)(.*)/, '\1 [FILTERED]')
         end
       end
 

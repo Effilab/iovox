@@ -42,8 +42,10 @@ additional_information = {
   zipcode: 'N/A',
 }
 
+region_picker = regions.shuffle.cycle
+
 items = Array.new(options[:count]) do
-  region = regions.sample
+  region = region_picker.next
 
   item = {
     quantity: 1,

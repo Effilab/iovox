@@ -42,6 +42,8 @@ RSpec.describe 'createNodeFull', :api_audit, :api_clean do
     }
   end
 
+  let(:contact_phone_number) { nil }
+
   context 'when contact phone_number is missing' do
     let(:contact_phone_number) { '' }
 
@@ -141,6 +143,33 @@ RSpec.describe 'createNodeFull', :api_audit, :api_clean do
         'email' => nil,
         'business_phone' => contact_params[:phone_number]
       )
+    end
+  end
+
+  context 'when requesting a voxnumber with an unknown zipcode' do
+    before do
+      node_params.dig(:links, :link, :rules_variable, :rule).delete(:contact)
+
+      node_params.dig(:links, :link).merge!(
+        assign_voxnumber: {
+          method: 'BY POSTCODE',
+          voxnumber_country: 'FRANCE',
+          postcode: '666',
+        }
+      )
+    end
+
+    it 'fails to create anything' do
+      expect {
+        client.create_node_full(payload: { request: { node: node_params } })
+      }.to raise_error(
+        Iovox::Middleware::ClientError,
+        /There is no VoxNumber available in your account for the Postcode 666 or the fallback area/
+      )
+
+      link = client.get_links(query: { link_id: common_id }).result
+
+      expect(link).to be_nil
     end
   end
 end

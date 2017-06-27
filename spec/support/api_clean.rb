@@ -44,7 +44,9 @@ api_cleaner = Class.new do
           .select { |contact| contact['contact_id']&.start_with?('test/') }
           .map { |contact| contact['contact_id'] }
 
-      client.delete_contacts(query: { contact_ids: contact_ids.join(',') }) unless contact_ids.empty?
+      unless contact_ids.empty?
+        client.delete_contacts(query: { contact_ids: contact_ids.join(','), rm_rules: 'TRUE' })
+      end
     end
   end
 end

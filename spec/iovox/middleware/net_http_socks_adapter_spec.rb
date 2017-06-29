@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'Iovox::Middleware::NetHTTPSOCKSAdapter' do
+RSpec.describe 'Iovox::Middleware::NetHTTPSOCKSAdapter', order: :defined do
   describe 'optional dependency' do
     def without_load_path(path_regex)
       library_path_index = $LOAD_PATH.find_index { |path| path =~ path_regex }
@@ -12,7 +12,7 @@ RSpec.describe 'Iovox::Middleware::NetHTTPSOCKSAdapter' do
       $LOAD_PATH.insert(library_path_index + 1, library_path)
     end
 
-    before(:each) do
+    before(:example) do
       if defined?(Iovox::Middleware::NetHTTPSOCKSAdapter)
         skip('library has already been loaded, skipping not applicable example')
       end

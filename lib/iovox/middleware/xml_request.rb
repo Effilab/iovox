@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require 'gyoku'
+require 'iovox/kernel'
+Iovox::Kernel.require 'gyoku', verbose: false
 
 module Iovox
   module Middleware

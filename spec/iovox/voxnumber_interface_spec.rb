@@ -2,7 +2,7 @@
 
 require 'iovox/voxnumber_interface'
 
-RSpec.describe Iovox::VoxnumberInterface do
+RSpec.describe Iovox::VoxnumberInterface, :api do
   let(:registry) do
     double(client: Iovox::Client.new)
   end

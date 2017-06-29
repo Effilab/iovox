@@ -5,12 +5,14 @@ require 'faraday'
 require 'faraday_middleware'
 
 require 'iovox'
+require 'iovox/configuration'
 require 'iovox/string_inflector'
-require 'iovox/xml'
 require 'iovox/middleware/request'
 require 'iovox/middleware/xml_request'
-require 'iovox/middleware/logger'
 require 'iovox/middleware/encoder'
+require 'iovox/middleware/read_only'
+require 'iovox/middleware/raise_error'
+require 'iovox/logger'
 
 class Iovox::Client
   require 'iovox/client/response'
@@ -19,32 +21,45 @@ class Iovox::Client
   API_INTERFACES = YAML.load_file(Iovox.root.join('config', 'interfaces.yml'))
 
   class << self
-    attr_accessor :configuration
+    def configuration
+      @configuration || load_configuration
+    end
+
+    private
+
+    attr_reader :config_mutex
+
+    def load_ivars
+      @config_mutex = Mutex.new
+      @configuration = nil
+    end
+
+    def load_configuration
+      config_mutex.synchronize do
+        @configuration ||= Iovox::Configuration.defaults
+      end
+    end
   end
 
-  @configuration = {
-    url: ENV.fetch('IOVOX_URL', 'https://api.iovox.com:444'),
-    credentials: {
-      username:   ENV['IOVOX_USERNAME'],
-      secure_key: ENV['IOVOX_SECURE_KEY'],
-    },
-    logger: nil,
-    read_only: false,
-    socks_proxy: nil,
-  }
+  load_ivars
 
-  attr_reader :conn
+  attr_reader :conn, :logger
 
-  def initialize(config = self.class.configuration)
-    @conn = establish_connection(config)
+  def initialize(config = self.class.configuration, **args)
+    config = config.merge(args) unless args.empty?
+
+    if config[:logger]
+      @logger = config[:logger] == true ? default_logger : config[:logger]
+    end
+
     @read_only = config.fetch(:read_only, false)
+
+    @conn = establish_connection(config)
   end
 
   def read_only?
     @read_only
   end
-
-  attr_writer :read_only
 
   def establish_connection(config)
     url = config.fetch(:url).to_s
@@ -57,14 +72,15 @@ class Iovox::Client
     end
 
     Faraday.new(url: url) do |conn|
+      conn.use Iovox::Middleware::ReadOnly if read_only?
       conn.use Iovox::Middleware::Request, iovox_request_opts
       conn.use Iovox::Middleware::XmlRequest
-      conn.response :raise_error
+      conn.use Iovox::Middleware::RaiseError
       conn.response :xml, :content_type => /\bxml$/
 
       if config[:logger]
-        conn.use Iovox::Middleware::Logger, config[:logger], bodies: true do |middleware|
-          middleware.filter(/(secureKey:)(.*)/,'\1 [FILTERED]')
+        conn.response :logger, logger, bodies: true do |middleware|
+          middleware.filter(/(secureKey:)(.*)/, '\1 [FILTERED]')
         end
       end
 
@@ -92,12 +108,8 @@ class Iovox::Client
 
     definition = format(<<~RUBY, definition_params)
       def %{method_name}(query: nil, payload: nil, q: nil, p: nil)
-        authorize_http_method(:%{http_method})
-
         query ||= q
         payload ||= p
-
-        payload = serialize(payload, :%{method_name})
 
         response = conn.%{faraday_method_name}('%{iovox_interface_name}') do |req|
           req.params[:method] = '%{iovox_method_name}'
@@ -120,23 +132,7 @@ class Iovox::Client
 
   private
 
-  def http_method_safe?(http_method)
-    return true unless read_only?
-
-    http_method == :GET
-  end
-
-  def authorize_http_method(http_method)
-    return if http_method_safe?(http_method)
-
-    raise "Rejected unsafe HTTP #{http_method} method"
-  end
-
-  def serialize(payload, method_name)
-    return payload unless (
-      payload.is_a?(Hash) && Iovox::XML.respond_to?(method_name)
-    )
-
-    Iovox::XML.public_send(method_name, payload)
+  def default_logger
+    Iovox::Logger.new(STDOUT)
   end
 end

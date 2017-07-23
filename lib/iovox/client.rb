@@ -9,6 +9,7 @@ require 'iovox/configuration'
 require 'iovox/string_inflector'
 require 'iovox/middleware/request'
 require 'iovox/middleware/xml_request'
+require 'iovox/middleware/logger'
 require 'iovox/middleware/encoder'
 require 'iovox/middleware/read_only'
 require 'iovox/middleware/raise_error'
@@ -79,7 +80,7 @@ class Iovox::Client
       conn.response :xml, :content_type => /\bxml$/
 
       if config[:logger]
-        conn.response :logger, logger, bodies: true do |middleware|
+        conn.use Iovox::Middleware::Logger, config[:logger], bodies: true do |middleware|
           middleware.filter(/(secureKey:)(.*)/, '\1 [FILTERED]')
         end
       end

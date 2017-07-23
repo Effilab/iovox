@@ -87,10 +87,7 @@ class Iovox::Client
       conn.use Iovox::Middleware::Encoder
 
       if socks_server && socks_port
-        conn.use Iovox::Middleware::NetHTTPSOCKSAdapter do |http|
-          http.socks_server = socks_server
-          http.socks_port = socks_port
-        end
+        conn.use Iovox::Middleware::NetHTTPSOCKSAdapter, socks_server, socks_port
       else
         conn.adapter Faraday.default_adapter
       end

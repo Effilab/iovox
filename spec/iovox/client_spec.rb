@@ -45,7 +45,7 @@ RSpec.describe Iovox::Client do
     end
 
     context 'when :logger is truthy' do
-      let(:middleware) { Faraday::Response::Logger }
+      let(:middleware) { Iovox::Middleware::Logger }
       let(:client) { described_class.new(logger: logger) }
 
       shared_examples 'connection logger' do

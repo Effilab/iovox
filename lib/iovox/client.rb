@@ -80,7 +80,7 @@ class Iovox::Client
       conn.response :xml, :content_type => /\bxml$/
 
       if config[:logger]
-        conn.use Iovox::Middleware::Logger, config[:logger], bodies: true do |middleware|
+        conn.use Iovox::Middleware::Logger, logger, bodies: true do |middleware|
           middleware.filter(/(secureKey:)(.*)/, '\1 [FILTERED]')
         end
       end

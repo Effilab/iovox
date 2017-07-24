@@ -44,6 +44,40 @@ RSpec.describe Iovox::Client do
       end
     end
 
+    context 'when :logger is truthy' do
+      let(:middleware) { Faraday::Response::Logger }
+      let(:client) { described_class.new(logger: logger) }
+
+      shared_examples 'connection logger' do
+        it 'logs full interactions' do
+          expect(conn_middlewares(client.conn)).to include(middleware)
+          expect(middleware).to receive(:new).with(a_value, client.logger, bodies: true)
+
+          client.conn.builder.app
+        end
+      end
+
+      context 'when :logger is true' do
+        let(:logger) { true }
+
+        it 'uses its default logger' do
+          expect(client.logger).to be_a(Logger)
+        end
+
+        include_examples 'connection logger'
+      end
+
+      context 'when :logger is a logger' do
+        let(:logger) { double('logger') }
+
+        it 'has the given logger' do
+          expect(client.logger).to be(logger)
+        end
+
+        include_examples 'connection logger'
+      end
+    end
+
     context 'when a SOCKS proxy is configured' do
       let(:config) do
         Hash[socks_proxy: { server: '0.0.0.0', port: '8888' }]

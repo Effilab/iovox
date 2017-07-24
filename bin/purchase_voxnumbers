@@ -9,19 +9,29 @@ options = {
   count: 10,
   country_code: '33',
   number_type: 'GEOGRAPHIC',
+  area_code: nil,
+  city_name: nil,
 }
 
 Iovox::Cli::Parser.new do |opts|
-  opts.on('--count=COUNT', "Number of voxnumbers to purchase, default: #{options[:count]}") do |value|
+  opts.on('--count=COUNT', "Number of voxnumbers to purchase, default: #{options[:count].inspect}") do |value|
     options[:count] = Integer(value)
   end
 
-  opts.on('--country-code=CODE', "Country code of the voxnumbers to purchase, default: #{options[:country_code]}") do |value|
+  opts.on('--country-code=CODE', "Country code of the voxnumbers to purchase, default: #{options[:country_code].inspect}") do |value|
     options[:country_code] = value
   end
 
-  opts.on('--number-type=TYPE', "Number type of the voxnumbers to purchase, default: #{options[:number_type]}") do |value|
+  opts.on('--number-type=TYPE', "Number type of the voxnumbers to purchase, default: #{options[:number_type].inspect}") do |value|
     options[:number_type] = value
+  end
+
+  opts.on('--area-code=CODE', "Country code of the voxnumbers to purchase, default: #{options[:area_code].inspect}") do |value|
+    options[:area_code] = value.split(',')
+  end
+
+  opts.on('--city-name=NAME', "City name of the voxnumbers to purchase, default: #{options[:city_name].inspect}") do |value|
+    options[:city_name] = value.split(',')
   end
 end.call
 
@@ -32,6 +42,26 @@ regions = client.get_voxnumber_regions(query: {
   number_type: options[:number_type],
 }).result
 
+if options[:area_code] && !options[:area_code].empty?
+  regions.select! do |region|
+    options[:area_code].include?(region['area_code'])
+  end
+
+  raise ArgumentError, 'Invalid area code' if regions.empty?
+end
+
+if options[:city_name] && !options[:city_name].empty?
+  regions.select! do |region|
+    options[:city_name].any? do |name|
+      name.casecmp?(region['city_name'])
+    end
+  end
+
+  raise ArgumentError, 'Invalid city name or area code, or their combination' if regions.empty?
+end
+
+region_picker = regions.shuffle.cycle
+
 additional_information = {
   firstname: 'N/A',
   lastname: 'N/A',
@@ -41,8 +71,6 @@ additional_information = {
   city: 'N/A',
   zipcode: 'N/A',
 }
-
-region_picker = regions.shuffle.cycle
 
 items = Array.new(options[:count]) do
   region = region_picker.next

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'faraday'
+
 module Iovox
   module Middleware
     class ClientError < Faraday::ClientError
@@ -23,7 +25,13 @@ module Iovox
       def unwrap_api_message(response)
         return unless response.respond_to?(:dig)
 
-        response.dig(:body, 'errors', 'error', '__content__')
+        errors = response.dig(:body, 'errors', 'error')
+
+        if errors.is_a?(Array)
+          errors.map { |error| error['__content__'] }.join(', ')
+        else
+          errors['__content__']
+        end
       end
     end
 

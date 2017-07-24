@@ -99,11 +99,20 @@ waiter = -> { Time.now - start_at }
 last_wait_time = 0
 
 req_thread = Thread.new do
-  client.purchase_vox_numbers(payload: {
-    request: {
-      items: items,
-    },
-  }) { |req| req.options.timeout = 3600 }
+  res =
+    client.purchase_vox_numbers(payload: { request: { items: items } }) do |req|
+      req.options.timeout = 3600
+    end
+
+  entries = res.body.dig('response', 'voxnumbers', 'voxnumber')
+  entries = [entries] unless entries.is_a?(Array)
+
+  headers = %w[country_code area_code full_voxnumber]
+
+  rows = entries.map { |entry| entry.values_at(*headers) }
+  rows.unshift(headers)
+
+  rows
 end
 
 req_thread.abort_on_exception = true
@@ -119,4 +128,23 @@ loop do
   end
 end
 
-puts "Completed in #{waiter.call} seconds"
+puts <<~EOT
+  Completed in #{waiter.call} seconds
+
+  RESULTS:
+
+EOT
+
+rows = req_thread.value
+
+headers = rows.shift
+
+puts "  #{headers.join(' | ')}"
+
+rows.each do |row|
+  row.map!.with_index do |column, i|
+    format("%-#{headers[i].length}s", column)
+  end
+
+  puts "  #{row.join(' | ')}"
+end

@@ -3,8 +3,7 @@ require_relative './lib/iovox/version'
 Gem::Specification.new do |spec|
   spec.name     = 'iovox'
   spec.version  = Iovox::VERSION
-  spec.authors  = ['Erwan Thomas']
-  spec.email    = ['erwan@effilab.com']
+  spec.authors  = ['Effilab']
   spec.summary  = 'IOVOX'
 
   spec.metadata['allowed_push_host'] = ''

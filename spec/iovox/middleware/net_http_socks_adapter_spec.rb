@@ -38,16 +38,19 @@ RSpec.describe 'Iovox::Middleware::NetHTTPSOCKSAdapter', order: :defined do
   describe 'Faraday adapter' do
     before(:all) { require 'iovox/middleware/net_http_socks_adapter' }
 
+    let(:app) { double }
+    let(:proxy_server) { '0.0.0.0' }
+    let(:proxy_port) { '9999' }
+
     let(:adapter) do
-      Iovox::Middleware::NetHTTPSOCKSAdapter.new
+      Iovox::Middleware::NetHTTPSOCKSAdapter.new(
+        app, proxy_server: proxy_server, proxy_port: proxy_port
+      )
     end
 
     let(:env) do
       { url: URI('http://foo.bar') }
     end
-
-    let(:proxy_server) { '0.0.0.0' }
-    let(:proxy_port) { '9999' }
 
     it 'uses a socksify version of Net::HTTP' do
       http = adapter.net_http_connection(env)

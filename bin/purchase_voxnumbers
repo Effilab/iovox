@@ -26,7 +26,7 @@ Iovox::Cli::Parser.new do |opts|
     options[:number_type] = value
   end
 
-  opts.on('--area-code=CODE', "Country code of the voxnumbers to purchase, default: #{options[:area_code].inspect}") do |value|
+  opts.on('--area-code=CODE', "Area code of the voxnumbers to purchase, default: #{options[:area_code].inspect}") do |value|
     options[:area_code] = value.split(',')
   end
 

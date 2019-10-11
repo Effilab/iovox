@@ -12,11 +12,11 @@ module Iovox
       def call(env)
         http_method = http_method(env)
 
-        if allowed?(http_method)
-          @app.call(env)
-        else
+        unless allowed?(http_method)
           raise ReadOnlyError, "#{http_method.to_s.upcase} requests are not allowed"
         end
+
+        @app.call(env)
       end
 
       private

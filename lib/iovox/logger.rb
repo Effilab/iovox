@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'time'
-require 'logger'
+require "time"
+require "logger"
 
 module Iovox
   class Logger < ::Logger
@@ -12,7 +12,7 @@ module Iovox
     end
   end
 
-  class Logger::Formatter
+  class Logger::Formatter # rubocop:disable Style/ClassAndModuleChildren
     FORMAT = "%s, [%s #%d:%s] %5s -- %s: %s\n"
 
     def call(severity, time, progname, msg)
@@ -49,7 +49,7 @@ module Iovox
       when ::String
         msg
       when ::Exception
-        format("%s (%s)\n%s", msg.message, msg.class, (msg.backtrace || []).join("\n"))
+        "#{msg.message} (#{msg.class})\n#{(msg.backtrace || []).join("\n")}"
       else
         msg.inspect
       end

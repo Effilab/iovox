@@ -1,10 +1,13 @@
 # frozen_string_literal: true
 
-RSpec.describe 'Iovox::Middleware::NetHTTPSOCKSAdapter', order: :defined do
-  describe 'optional dependency' do
+described_class = "Iovox::Middleware::NetHTTPSOCKSAdapter"
+
+RSpec.describe described_class, order: :defined do # rubocop:disable RSpec/DescribeClass
+  describe "optional dependency" do
     def without_load_path(path_regex)
       library_path_index = $LOAD_PATH.find_index { |path| path =~ path_regex }
       return yield unless library_path_index
+
       library_path = $LOAD_PATH[library_path_index]
 
       $LOAD_PATH.delete_at(library_path_index)
@@ -12,35 +15,37 @@ RSpec.describe 'Iovox::Middleware::NetHTTPSOCKSAdapter', order: :defined do
       $LOAD_PATH.insert(library_path_index + 1, library_path)
     end
 
-    before(:example) do
+    before do
       if defined?(Iovox::Middleware::NetHTTPSOCKSAdapter)
-        skip('library has already been loaded, skipping not applicable example')
+        skip("library has already been loaded, skipping not applicable example")
       end
     end
 
-    it 'is not required by default' do
-      require 'iovox/client'
+    it "is not required by default" do
+      require "iovox/client"
 
       expect(defined?(Iovox::Middleware::NetHTTPSOCKSAdapter)).to be_nil
     end
 
-    context 'when it is required with an invalid LOAD_PATH' do
-      it 'explains the resulting LoadError' do
+    context "when it is required with an invalid LOAD_PATH" do
+      it "explains the resulting LoadError" do
         without_load_path(/socksify/) do
-          expect {
-            require 'iovox/middleware/net_http_socks_adapter'
-          }.to raise_error(LoadError, /socksify.*Gemfile/)
+          expect do
+            require "iovox/middleware/net_http_socks_adapter"
+          end.to raise_error(LoadError, /socksify.*Gemfile/)
         end
       end
     end
   end
 
-  describe 'Faraday adapter' do
-    before(:all) { require 'iovox/middleware/net_http_socks_adapter' }
+  describe "Faraday adapter" do
+    before(:context) do
+      require "iovox/middleware/net_http_socks_adapter"
+    end
 
     let(:app) { double }
-    let(:proxy_server) { '0.0.0.0' }
-    let(:proxy_port) { '9999' }
+    let(:proxy_server) { "0.0.0.0" }
+    let(:proxy_port) { "9999" }
 
     let(:adapter) do
       Iovox::Middleware::NetHTTPSOCKSAdapter.new(
@@ -49,10 +54,10 @@ RSpec.describe 'Iovox::Middleware::NetHTTPSOCKSAdapter', order: :defined do
     end
 
     let(:env) do
-      { url: URI('http://foo.bar') }
+      { url: URI("http://foo.bar") }
     end
 
-    it 'uses a socksify version of Net::HTTP' do
+    it "uses a socksify version of Net::HTTP" do
       http = adapter.net_http_connection(env)
 
       http.socks_server = proxy_server

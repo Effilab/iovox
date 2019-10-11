@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'forwardable'
-require 'faraday'
-require 'iovox/client' unless defined?(Iovox::Client)
+require "forwardable"
+require "faraday"
+require "iovox/client" unless defined?(Iovox::Client)
 
-class Iovox::Client::Response
+class Iovox::Client::Response # rubocop:disable Style/ClassAndModuleChildren
   extend Forwardable
 
   attr_reader :response
@@ -16,6 +16,6 @@ class Iovox::Client::Response
   def_delegators :response, *Faraday::Response.public_instance_methods(false)
 
   def result
-    body.fetch('response').fetch('results')&.fetch('result')
+    body.fetch("response").fetch("results")&.fetch("result")
   end
 end

@@ -1,75 +1,92 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'bundler/setup'
-require 'dotenv/load'
-require 'iovox/cli'
+require "bundler/setup"
+require "dotenv/load"
+require "iovox/cli"
 
 options = {
   count: 10,
-  country_code: '33',
-  number_type: 'GEOGRAPHIC',
+  country_code: "33",
+  number_type: "GEOGRAPHIC",
   area_code: nil,
-  city_name: nil,
+  city_name: nil
 }
 
-Iovox::Cli::Parser.new do |opts|
-  opts.on('--count=COUNT', "Number of voxnumbers to purchase, default: #{options[:count].inspect}") do |value|
+Iovox::Cli::Parser.new do |opts| # rubocop:disable Metrics/BlockLength
+  opts.on(
+    "--count=COUNT",
+    "Number of voxnumbers to purchase, default: #{options[:count].inspect}"
+  ) do |value|
     options[:count] = Integer(value)
   end
 
-  opts.on('--country-code=CODE', "Country code of the voxnumbers to purchase, default: #{options[:country_code].inspect}") do |value|
+  opts.on(
+    "--country-code=CODE",
+    "Country code of the voxnumbers to purchase, default: #{options[:country_code].inspect}"
+  ) do |value|
     options[:country_code] = value
   end
 
-  opts.on('--number-type=TYPE', "Number type of the voxnumbers to purchase, default: #{options[:number_type].inspect}") do |value|
+  opts.on(
+    "--number-type=TYPE",
+    "Number type of the voxnumbers to purchase, default: #{options[:number_type].inspect}"
+  ) do |value|
     options[:number_type] = value
   end
 
-  opts.on('--area-code=CODE', "Area code of the voxnumbers to purchase, default: #{options[:area_code].inspect}") do |value|
-    options[:area_code] = value.split(',')
+  opts.on(
+    "--area-code=CODE",
+    "Area code of the voxnumbers to purchase, default: #{options[:area_code].inspect}"
+  ) do |value|
+    options[:area_code] = value.split(",")
   end
 
-  opts.on('--city-name=NAME', "City name of the voxnumbers to purchase, default: #{options[:city_name].inspect}") do |value|
-    options[:city_name] = value.split(',')
+  opts.on(
+    "--city-name=NAME",
+    "City name of the voxnumbers to purchase, default: #{options[:city_name].inspect}"
+  ) do |value|
+    options[:city_name] = value.split(",")
   end
 end.call
 
 client = Iovox::Client.new
 
-regions = client.get_voxnumber_regions(query: {
-  country_code: options[:country_code],
-  number_type: options[:number_type],
-}).result
+regions = client.get_voxnumber_regions(
+  query: {
+    country_code: options[:country_code],
+    number_type: options[:number_type]
+  }
+).result
 
 if options[:area_code] && !options[:area_code].empty?
   regions.select! do |region|
-    options[:area_code].include?(region['area_code'])
+    options[:area_code].include?(region["area_code"])
   end
 
-  raise ArgumentError, 'Invalid area code' if regions.empty?
+  raise ArgumentError, "Invalid area code" if regions.empty?
 end
 
 if options[:city_name] && !options[:city_name].empty?
   regions.select! do |region|
     options[:city_name].any? do |name|
-      name.casecmp?(region['city_name'])
+      name.casecmp?(region["city_name"])
     end
   end
 
-  raise ArgumentError, 'Invalid city name or area code, or their combination' if regions.empty?
+  raise ArgumentError, "Invalid city name or area code, or their combination" if regions.empty?
 end
 
 region_picker = regions.shuffle.cycle
 
 additional_information = {
-  firstname: 'N/A',
-  lastname: 'N/A',
-  company: 'N/A',
-  street: 'N/A',
-  building_number: '1',
-  city: 'N/A',
-  zipcode: 'N/A',
+  firstname: "N/A",
+  lastname: "N/A",
+  company: "N/A",
+  street: "N/A",
+  building_number: "1",
+  city: "N/A",
+  zipcode: "N/A"
 }
 
 items = Array.new(options[:count]) do
@@ -77,11 +94,11 @@ items = Array.new(options[:count]) do
 
   item = {
     quantity: 1,
-    country_code: region['country_code'],
-    area_code: region['area_code'],
-    city_name: region['city_name'],
+    country_code: region["country_code"],
+    area_code: region["area_code"],
+    city_name: region["city_name"],
     number_type: options[:number_type],
-    additional_information: additional_information,
+    additional_information: additional_information
   }
 
   { item: item }
@@ -104,7 +121,7 @@ req_thread = Thread.new do
       req.options.timeout = 3600
     end
 
-  entries = res.body.dig('response', 'voxnumbers', 'voxnumber')
+  entries = res.body.dig("response", "voxnumbers", "voxnumber")
   entries = [entries] unless entries.is_a?(Array)
 
   headers = %w[country_code area_code full_voxnumber]
@@ -128,12 +145,12 @@ loop do
   end
 end
 
-puts <<~EOT
+puts <<~MSG
   Completed in #{waiter.call} seconds
 
   RESULTS:
 
-EOT
+MSG
 
 rows = req_thread.value
 

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'faraday'
+require "faraday"
 
 module Iovox
   module Middleware
@@ -25,12 +25,12 @@ module Iovox
       def unwrap_api_message(response)
         return unless response.respond_to?(:dig)
 
-        errors = response.dig(:body, 'errors', 'error')
+        errors = response.dig(:body, "errors", "error")
 
         if errors.is_a?(Array)
-          errors.map { |error| error['__content__'] }.join(', ')
+          errors.map { |error| error["__content__"] }.join(", ")
         else
-          errors['__content__']
+          errors["__content__"]
         end
       end
     end

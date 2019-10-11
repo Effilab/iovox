@@ -14,7 +14,7 @@ module Iovox
 
       def call(request_env)
         @app.call(request_env).on_complete do |response_env|
-          response_env[:body].force_encoding('UTF-8')
+          response_env[:body].force_encoding("UTF-8")
         end
       end
     end

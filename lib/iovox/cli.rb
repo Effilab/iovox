@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'optparse'
+require "optparse"
 
 module Iovox
   module Cli
@@ -14,8 +14,8 @@ module Iovox
       def call(argv = ARGV)
         begin
           optparser.order!(argv)
-        rescue OptionParser::InvalidOption => error
-          argv.unshift(*error.args)
+        rescue OptionParser::InvalidOption => e
+          argv.unshift(*e.args)
         end
 
         argv
@@ -26,59 +26,57 @@ end
 
 options = {
   proxy: false,
-  target: :dev,
+  target: :dev
 }
 
 Iovox::Cli::Parser.new do |opts|
-  opts.on('--[no-]proxy', "Proxy TCP sockets, default: #{options[:proxy]}") do |value|
+  opts.on("--[no-]proxy", "Proxy TCP sockets, default: #{options[:proxy]}") do |value|
     options[:proxy] = value
   end
 
-  opts.on('--target=NAME', "Target name (dev/prod), default: #{options[:target]}") do |value|
+  opts.on("--target=NAME", "Target name (dev/prod), default: #{options[:target]}") do |value|
     case value
-    when 'dev', 'prod'
+    when "dev", "prod"
       options[:target] = value.to_sym
     else
-      raise ArgumentError, 'Unknown value for --target argument'
+      raise ArgumentError, "Unknown value for --target argument"
     end
   end
 end.call
 
 case options[:target]
 when :prod
-  ENV['IOVOX_URL']        ||= ENV.fetch('PROD_IOVOX_URL')
-  ENV['IOVOX_USERNAME']   ||= ENV.fetch('PROD_IOVOX_USERNAME')
-  ENV['IOVOX_SECURE_KEY'] ||= ENV.fetch('PROD_IOVOX_SECURE_KEY')
+  ENV["IOVOX_URL"]        ||= ENV.fetch("PROD_IOVOX_URL")
+  ENV["IOVOX_USERNAME"]   ||= ENV.fetch("PROD_IOVOX_USERNAME")
+  ENV["IOVOX_SECURE_KEY"] ||= ENV.fetch("PROD_IOVOX_SECURE_KEY")
 else
-  ENV['IOVOX_URL']        ||= ENV.fetch('DEV_IOVOX_URL')
-  ENV['IOVOX_USERNAME']   ||= ENV.fetch('DEV_IOVOX_USERNAME')
-  ENV['IOVOX_SECURE_KEY'] ||= ENV.fetch('DEV_IOVOX_SECURE_KEY')
+  ENV["IOVOX_URL"]        ||= ENV.fetch("DEV_IOVOX_URL")
+  ENV["IOVOX_USERNAME"]   ||= ENV.fetch("DEV_IOVOX_USERNAME")
+  ENV["IOVOX_SECURE_KEY"] ||= ENV.fetch("DEV_IOVOX_SECURE_KEY")
 end
 
 if options[:proxy]
   case options[:target]
   when :prod
-    ENV['LOCAL_PROXY_SERVER'] ||= ENV['PROD_LOCAL_PROXY_SERVER']
-    ENV['LOCAL_PROXY_PORT'] ||= ENV['PROD_LOCAL_PROXY_PORT']
+    ENV["LOCAL_PROXY_SERVER"] ||= ENV["PROD_LOCAL_PROXY_SERVER"]
+    ENV["LOCAL_PROXY_PORT"] ||= ENV["PROD_LOCAL_PROXY_PORT"]
   else
-    ENV['LOCAL_PROXY_SERVER'] ||= ENV['DEV_LOCAL_PROXY_SERVER']
-    ENV['LOCAL_PROXY_PORT'] ||= ENV['DEV_LOCAL_PROXY_PORT']
+    ENV["LOCAL_PROXY_SERVER"] ||= ENV["DEV_LOCAL_PROXY_SERVER"]
+    ENV["LOCAL_PROXY_PORT"] ||= ENV["DEV_LOCAL_PROXY_PORT"]
   end
 end
 
-require 'iovox/client'
+require "iovox/client"
 
 Iovox::Client.configuration[:logger] = Iovox::Logger.new(
-  File.join('log', "#{options[:target]}.log")
+  File.join("log", "#{options[:target]}.log")
 )
 
 if options[:proxy]
   Iovox::Client.configuration[:socks_proxy] = {
-    server: ENV['LOCAL_PROXY_SERVER'],
-    port: ENV['LOCAL_PROXY_PORT'],
+    server: ENV["LOCAL_PROXY_SERVER"],
+    port: ENV["LOCAL_PROXY_PORT"]
   }
 end
 
-if options[:target] == :prod
-  Iovox::Client.configuration[:read_only] = true
-end
+Iovox::Client.configuration[:read_only] = true if options[:target] == :prod

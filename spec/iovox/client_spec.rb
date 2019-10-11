@@ -9,18 +9,36 @@ RSpec.describe Iovox::Client do
         Class.new(described_class) { load_ivars }
       end
 
-      specify 'are lazy-loaded in a thread-safe way' do
-        expect(Iovox::Configuration).to receive(:defaults).once do
-          sleep 0.01
+      specify 'are ready for usage' do
+        allow(ENV).to receive(:fetch).with('IOVOX_URL', any_args).and_return(url = double)
+        allow(ENV).to receive(:fetch).with('IOVOX_USERNAME').and_return(username = double)
+        allow(ENV).to receive(:fetch).with('IOVOX_SECURE_KEY').and_return(securekey = double)
 
-          :foo
+        expect(subject.default_configuration).to eq(
+          url: url,
+          credentials: {
+            username: username,
+            secure_key: securekey
+          },
+          logger: nil,
+          read_only: false,
+          socks_proxy: nil
+        )
+      end
+
+      specify 'are lazy-loaded in a thread-safe way' do
+        configuration = double
+
+        expect(subject).to receive(:default_configuration).once do
+          sleep 0.01
+          configuration
         end
 
         call_results = Array.new(2) do
           Thread.new { subject.configuration }
         end.map(&:value)
 
-        expect(call_results).to all(eq(:foo))
+        expect(call_results).to all(be(configuration))
       end
     end
 

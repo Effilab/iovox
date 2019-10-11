@@ -12,11 +12,9 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_development_dependency 'bundler'
-  spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'awesome_print'
   spec.add_development_dependency 'byebug'
-  spec.add_development_dependency 'faker'
   spec.add_development_dependency 'socksify'
   spec.add_development_dependency 'dotenv'
 

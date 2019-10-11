@@ -66,7 +66,7 @@ if options[:proxy]
   end
 end
 
-require 'iovox/all'
+require 'iovox/client'
 
 Iovox::Client.configuration[:logger] = Iovox::Logger.new(
   File.join('log', "#{options[:target]}.log")

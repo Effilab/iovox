@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-require_relative "./lib/iovox/version"
-
 Gem::Specification.new do |spec|
   spec.name     = "iovox"
-  spec.version  = Iovox::VERSION
+  spec.version  = File.read(File.expand_path("VERSION", __dir__)).strip
   spec.authors  = ["Effilab"]
   spec.summary  = "IOVOX"
 

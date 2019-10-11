@@ -4,7 +4,6 @@ require "yaml"
 require "faraday"
 require "faraday_middleware"
 
-require_relative "../iovox"
 require_relative "string_inflector"
 require_relative "middleware/request"
 require_relative "middleware/xml_request"
@@ -18,7 +17,6 @@ module Iovox
     require_relative "client/response"
 
     API_VERSION = "3"
-    API_INTERFACES = YAML.load_file(Iovox.root.join("config", "interfaces.yml"))
 
     class << self
       def configuration
@@ -103,7 +101,9 @@ module Iovox
       end
     end
 
-    API_INTERFACES.each do |iovox_method_name, config|
+    YAML.load_file(
+      File.expand_path("../../config/interfaces.yml", __dir__)
+    ).each do |iovox_method_name, config|
       definition_params = {
         method_name: StringInflector.snake_case(iovox_method_name),
         http_method: config["type"].upcase,

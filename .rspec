@@ -1,4 +1,3 @@
 --require spec_helper
 --require iovox_helper
 --color
---tag ~api_audit

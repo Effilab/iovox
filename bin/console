@@ -1,11 +1,11 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'bundler/setup'
-require 'dotenv/load'
-require 'awesome_print'
-require 'byebug'
-require 'irb'
-require 'iovox/cli'
+require "bundler/setup"
+require "dotenv/load"
+require "awesome_print"
+require "byebug"
+require "irb"
+require "iovox/cli"
 
 IRB.start(__FILE__)

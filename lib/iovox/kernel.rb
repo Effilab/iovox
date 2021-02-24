@@ -3,7 +3,8 @@
 module Iovox
   module Kernel
     def self.require(name, verbose: $VERBOSE)
-      old_verbose, $VERBOSE = $VERBOSE, verbose
+      old_verbose = $VERBOSE
+      $VERBOSE = verbose
       super(name)
     ensure
       $VERBOSE = old_verbose

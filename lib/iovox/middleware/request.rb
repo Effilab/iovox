@@ -1,16 +1,14 @@
 # frozen_string_literal: true
 
-require 'rack/utils'
+require "rack/utils"
 
 module Iovox
   module Middleware
     class Request
-      USERNAME_HEADER = 'username'
-      SECURE_KEY_HEADER = 'secureKey'
-      VERSION_PARAM = 'v'
-      OUTPUT_PARAM = 'output'
-
-      attr_reader :options
+      USERNAME_HEADER = "username"
+      SECURE_KEY_HEADER = "secureKey"
+      VERSION_PARAM = "v"
+      OUTPUT_PARAM = "output"
 
       def initialize(app, options)
         @app = app
@@ -24,22 +22,29 @@ module Iovox
         @app.call(env)
       end
 
+      private
+
+      def change_query(env)
+        url = env[:url]
+        query_params = Rack::Utils.parse_query(url.query)
+        yield query_params
+        url.query = Rack::Utils.build_query(query_params)
+      end
+
       def ensure_presence_of_headers(env)
-        env[:request_headers][USERNAME_HEADER] ||= options.fetch(:username)
-        env[:request_headers][SECURE_KEY_HEADER] ||= options.fetch(:secure_key)
+        env[:request_headers][USERNAME_HEADER] ||= @options.fetch(:username)
+        env[:request_headers][SECURE_KEY_HEADER] ||= @options.fetch(:secure_key)
       end
 
       def ensure_presence_of_params(env)
-        return unless options.key?(:version) || options.key?(:output)
+        has_version = @options.key?(:version)
+        has_output = @options.key?(:output)
+        return unless has_version || has_output
 
-        url = env[:url]
-
-        query_params = Rack::Utils.parse_query(url.query)
-
-        query_params[VERSION_PARAM] ||= options[:version] if options.key?(:version)
-        query_params[OUTPUT_PARAM] ||= options[:output] if options.key?(:output)
-
-        url.query = Rack::Utils.build_query(query_params)
+        change_query(env) do |query|
+          query[VERSION_PARAM] ||= @options[:version] if has_version
+          query[OUTPUT_PARAM] ||= @options[:output] if has_output
+        end
       end
     end
   end

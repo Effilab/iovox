@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
-require 'iovox/kernel'
-Iovox::Kernel.require 'gyoku', verbose: false
+require "iovox/kernel"
+Iovox::Kernel.require "gyoku", verbose: false
 
 module Iovox
   module Middleware
     class XmlRequest
-      CONTENT_TYPE    = 'Content-Type'
-      MIME_TYPE       = 'application/xml'
-      MIME_TYPE_REGEX = /^application\/(vnd\..+\+)?xml$/
+      CONTENT_TYPE    = "Content-Type"
+      MIME_TYPE       = "application/xml"
+      MIME_TYPE_REGEX = %r{^application/(vnd\..+\+)?xml$}.freeze
 
       def initialize(app)
         @app = app
@@ -24,23 +24,21 @@ module Iovox
 
       def match_request(env)
         return unless process_request?(env)
+
         env[:request_headers][CONTENT_TYPE] ||= MIME_TYPE
         yield(env[:body])
       end
 
       def process_request?(env)
         type = request_type(env)
-        has_matching_body?(env) && (type.empty? || MIME_TYPE_REGEX =~ type)
+
+        env[:body].is_a?(Hash) && (type.empty? || MIME_TYPE_REGEX =~ type)
       end
 
       def request_type(env)
         type = env[:request_headers][CONTENT_TYPE].to_s
-        type = type.split(';', 2).first if type.index(';')
+        type = type.split(";", 2).first if type.index(";")
         type
-      end
-
-      def has_matching_body?(env)
-        env[:body].is_a?(Hash)
       end
 
       def serialize_to_xml(payload)

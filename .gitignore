@@ -11,7 +11,7 @@
 !/log/.keep
 
 # rspec failure tracking
-.rspec_status
+/spec/examples.txt
 
 .byebug_history
 .env

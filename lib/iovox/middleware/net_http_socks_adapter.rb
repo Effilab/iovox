@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
-require 'net/http'
-require 'faraday/adapter/net_http'
+require "net/http"
+require "faraday/adapter/net_http"
 
 begin
-  require 'socksify'
+  require "socksify"
 rescue LoadError
-  raise LoadError, 'LoadError: cannot load such file -- socksify. ' \
+  raise LoadError, "LoadError: cannot load such file -- socksify. " \
                    'Add the "socksify" gem to your Gemfile to continue ' \
-                   'using Iovox::Middleware::NetHTTPSOCKSAdapter.'
+                   "using Iovox::Middleware::NetHTTPSOCKSAdapter."
 end
 
 module Iovox
@@ -33,7 +33,7 @@ module Iovox
 
       def net_http_connection(env)
         host = env[:url].host
-        port = env[:url].port || (env[:url].scheme == 'https' ? 443 : 80)
+        port = env[:url].port || (env[:url].scheme == "https" ? 443 : 80)
 
         NetHTTPSOCKS.new(host, port).tap do |http|
           http.socks_server = socks_server

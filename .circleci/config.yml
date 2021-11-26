@@ -4,16 +4,9 @@ commands:
   build:
     steps:
       - checkout
-      # We can't use restore_cache because we don't include a Gemfile.lock in the Gem repo
-      - run:
-          name: install dependencies
-          command: |
-            bundle install --jobs=4 --retry=3 --path vendor/bundle
+      - run: bundle install --jobs=4 --retry=3 --path vendor/bundle
       - run: bundle exec standardrb
-      - run:
-          name: run tests
-          command: |
-            bundle exec rspec spec --format progress
+      - run: bundle exec rspec spec --format progress
 
 jobs:
   build_3_x:

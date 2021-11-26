@@ -13,11 +13,7 @@ commands:
       - run:
           name: run tests
           command: |
-            mkdir /tmp/test-results
-
-            bundle exec rspec spec \
-              --out /tmp/test-results/rspec.xml \
-              --format progress
+            bundle exec rspec spec --format progress
 
 jobs:
   build_3_x:

@@ -8,7 +8,7 @@ module Iovox
     class XmlRequest
       CONTENT_TYPE = "Content-Type"
       MIME_TYPE = "application/xml"
-      MIME_TYPE_REGEX = %r{^application/(vnd\..+\+)?xml$}.freeze
+      MIME_TYPE_REGEX = %r{^application/(vnd\..+\+)?xml$}
 
       def initialize(app)
         @app = app

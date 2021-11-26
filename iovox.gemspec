@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 Gem::Specification.new do |spec|
-  spec.name     = "iovox"
-  spec.version  = File.read(File.expand_path("VERSION", __dir__)).strip
-  spec.authors  = ["Effilab"]
-  spec.summary  = "IOVOX"
+  spec.name = "iovox"
+  spec.version = File.read(File.expand_path("VERSION", __dir__)).strip
+  spec.authors = ["Effilab"]
+  spec.summary = "IOVOX"
 
   spec.metadata["allowed_push_host"] = ""
 
@@ -16,13 +16,11 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "byebug"
   spec.add_development_dependency "dotenv"
   spec.add_development_dependency "rspec"
-  spec.add_development_dependency "rubocop"
-  spec.add_development_dependency "rubocop-performance"
-  spec.add_development_dependency "rubocop-rspec"
+  spec.add_development_dependency "standardrb"
   spec.add_development_dependency "socksify"
 
-  spec.add_runtime_dependency "faraday", ">= 0.11"
-  spec.add_runtime_dependency "faraday_middleware", ">= 0.11"
+  spec.add_runtime_dependency "faraday", ">= 0.11", "<1"
+  spec.add_runtime_dependency "faraday_middleware", ">= 0.11", "<1"
   spec.add_runtime_dependency "gyoku"
   spec.add_runtime_dependency "multi_xml"
   spec.add_runtime_dependency "rack"

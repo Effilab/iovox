@@ -4,7 +4,7 @@ require "forwardable"
 require "faraday"
 require "iovox/client" unless defined?(Iovox::Client)
 
-class Iovox::Client::Response # rubocop:disable Style/ClassAndModuleChildren
+class Iovox::Client::Response
   extend Forwardable
 
   attr_reader :response

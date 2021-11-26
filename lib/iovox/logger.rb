@@ -12,7 +12,7 @@ module Iovox
     end
   end
 
-  class Logger::Formatter # rubocop:disable Style/ClassAndModuleChildren
+  class Logger::Formatter
     FORMAT = "%s, [%s #%d:%s] %5s -- %s: %s\n"
 
     def call(severity, time, progname, msg)

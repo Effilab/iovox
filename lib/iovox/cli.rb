@@ -46,12 +46,12 @@ end.call
 
 case options[:target]
 when :prod
-  ENV["IOVOX_URL"]        ||= ENV.fetch("PROD_IOVOX_URL")
-  ENV["IOVOX_USERNAME"]   ||= ENV.fetch("PROD_IOVOX_USERNAME")
+  ENV["IOVOX_URL"] ||= ENV.fetch("PROD_IOVOX_URL")
+  ENV["IOVOX_USERNAME"] ||= ENV.fetch("PROD_IOVOX_USERNAME")
   ENV["IOVOX_SECURE_KEY"] ||= ENV.fetch("PROD_IOVOX_SECURE_KEY")
 else
-  ENV["IOVOX_URL"]        ||= ENV.fetch("DEV_IOVOX_URL")
-  ENV["IOVOX_USERNAME"]   ||= ENV.fetch("DEV_IOVOX_USERNAME")
+  ENV["IOVOX_URL"] ||= ENV.fetch("DEV_IOVOX_URL")
+  ENV["IOVOX_USERNAME"] ||= ENV.fetch("DEV_IOVOX_USERNAME")
   ENV["IOVOX_SECURE_KEY"] ||= ENV.fetch("DEV_IOVOX_SECURE_KEY")
 end
 

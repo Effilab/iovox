@@ -16,7 +16,7 @@ commands:
             mkdir log/
             mkdir /tmp/test-results
 
-            bundle exec rspec spec\
+            bundle exec rspec spec \
               --format progress \
               --out /tmp/test-results/rspec.xml \
               --format progress

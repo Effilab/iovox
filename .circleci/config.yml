@@ -7,8 +7,9 @@ commands:
       - run: bundle install --jobs=4 --retry=3 --path vendor/bundle
       - run: bundle exec standardrb
       - run:
-        cp .env.example .env
-        bundle exec rspec spec --format progress
+        command: |
+          cp .env.example .env
+          bundle exec rspec spec --format progress
 
 jobs:
   build_3_x:

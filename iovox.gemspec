@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "byebug"
   spec.add_development_dependency "dotenv"
   spec.add_development_dependency "rspec"
-  spec.add_development_dependency "standardrb"
+  spec.add_development_dependency "standard", "1.4.0"
   spec.add_development_dependency "socksify"
 
   spec.add_runtime_dependency "faraday", ">= 0.11", "<1"

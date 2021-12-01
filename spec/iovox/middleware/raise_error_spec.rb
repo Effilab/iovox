@@ -37,7 +37,7 @@ RSpec.describe Iovox::Middleware::RaiseError do
 
   context "when there is a single error" do
     let(:error) do
-      { "status" => "400", "__content__" => "foo" }
+      {"status" => "400", "__content__" => "foo"}
     end
 
     it "handles the error" do
@@ -50,8 +50,8 @@ RSpec.describe Iovox::Middleware::RaiseError do
   context "when there are several errors" do
     let(:error) do
       [
-        { "status" => "400", "__content__" => "foo" },
-        { "status" => "400", "__content__" => "bar" }
+        {"status" => "400", "__content__" => "foo"},
+        {"status" => "400", "__content__" => "bar"}
       ]
     end
 

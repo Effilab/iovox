@@ -50,8 +50,8 @@ module Iovox
 
     attr_reader :conn, :logger
 
-    def initialize(config = self.class.configuration, **args)
-      config = config.merge(args) unless args.empty?
+    def initialize(args = {})
+      config = self.class.configuration.merge(args)
 
       if config[:logger]
         @logger = config[:logger] == true ? default_logger : config[:logger]
@@ -66,7 +66,7 @@ module Iovox
       @read_only
     end
 
-    def establish_connection(config) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+    def establish_connection(config)
       url = config.fetch(:url).to_s
       iovox_request_opts = config.fetch(:credentials).merge(output: "XML", version: API_VERSION)
 
@@ -139,7 +139,7 @@ module Iovox
     private
 
     def default_logger
-      Logger.new(STDOUT)
+      Logger.new($stdout)
     end
   end
 end

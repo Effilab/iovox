@@ -2,7 +2,7 @@
 
 described_class = "Iovox::Middleware::NetHTTPSOCKSAdapter"
 
-RSpec.describe described_class, order: :defined do # rubocop:disable RSpec/DescribeClass
+RSpec.describe described_class, order: :defined do
   describe "optional dependency" do
     def without_load_path(path_regex)
       library_path_index = $LOAD_PATH.find_index { |path| path =~ path_regex }
@@ -54,7 +54,7 @@ RSpec.describe described_class, order: :defined do # rubocop:disable RSpec/Descr
     end
 
     let(:env) do
-      { url: URI("http://foo.bar") }
+      {url: URI("http://foo.bar")}
     end
 
     it "uses a socksify version of Net::HTTP" do

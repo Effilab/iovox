@@ -6,9 +6,9 @@ Iovox::Kernel.require "gyoku", verbose: false
 module Iovox
   module Middleware
     class XmlRequest
-      CONTENT_TYPE    = "Content-Type"
-      MIME_TYPE       = "application/xml"
-      MIME_TYPE_REGEX = %r{^application/(vnd\..+\+)?xml$}.freeze
+      CONTENT_TYPE = "Content-Type"
+      MIME_TYPE = "application/xml"
+      MIME_TYPE_REGEX = %r{^application/(vnd\..+\+)?xml$}
 
       def initialize(app)
         @app = app

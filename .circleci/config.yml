@@ -1,0 +1,26 @@
+version: 2.1
+
+commands:
+  build:
+    steps:
+      - checkout
+      - run: bundle install --jobs=4 --retry=3 --path vendor/bundle
+      - run: bundle exec standardrb
+      - run:
+          name: run specs
+          command: |
+            cp .env.example .env
+            bundle exec rspec spec --format progress
+
+jobs:
+  build_3_x:
+    docker:
+      - image: ruby:3.0.2
+    steps:
+      - build
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build_3_x

@@ -99,7 +99,7 @@ RSpec.describe Iovox::Client do
     subject(:client) { described_class.new(config) }
 
     let(:config) do
-      Hash[socks_proxy: { server: "0.0.0.0", port: "8888" }]
+      {socks_proxy: {server: "0.0.0.0", port: "8888"}}
     end
 
     before(:context) { require "iovox/middleware/net_http_socks_adapter" }

@@ -15,7 +15,7 @@ commands:
 jobs:
   build_3_x:
     docker:
-      - image: ruby:3.0.2
+      - image: ruby:3.0.3
     steps:
       - build
 

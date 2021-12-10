@@ -92,7 +92,7 @@ module Iovox
         conn.use Middleware::Encoder
 
         if socks_server && socks_port
-          conn.use(
+          conn.adapter(
             Middleware::NetHTTPSOCKSAdapter, socks_server: socks_server, socks_port: socks_port
           )
         else

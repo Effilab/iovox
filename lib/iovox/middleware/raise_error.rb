@@ -36,6 +36,10 @@ module Iovox
     end
 
     class RaiseError < Faraday::Response::RaiseError
+      # def response_values(env)
+      #   require "pry"; binding.pry
+      # end
+
       def on_complete(env)
         case env[:status]
         when 404, 407

@@ -32,7 +32,6 @@ module Iovox
             username: ENV.fetch("IOVOX_USERNAME"),
             secure_key: ENV.fetch("IOVOX_SECURE_KEY")
           },
-          socks_proxy: nil,
           read_only: false,
           logger: nil
         }
@@ -70,12 +69,6 @@ module Iovox
       url = config.fetch(:url).to_s
       iovox_request_opts = config.fetch(:credentials).merge(output: "XML", version: API_VERSION)
 
-      if config[:socks_proxy]
-        require_relative "middleware/net_http_socks_adapter"
-
-        socks_server, socks_port = config[:socks_proxy].values_at(:server, :port)
-      end
-
       Faraday.new(url: url) do |conn|
         conn.use Middleware::ReadOnly if read_only?
         conn.use Middleware::Request, iovox_request_opts
@@ -90,14 +83,7 @@ module Iovox
         end
 
         conn.use Middleware::Encoder
-
-        if socks_server && socks_port
-          conn.use(
-            Middleware::NetHTTPSOCKSAdapter, socks_server: socks_server, socks_port: socks_port
-          )
-        else
-          conn.adapter Faraday.default_adapter
-        end
+        conn.adapter Faraday.default_adapter
       end
     end
 

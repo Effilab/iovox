@@ -72,11 +72,4 @@ Iovox::Client.configuration[:logger] = Iovox::Logger.new(
   File.join("log", "#{options[:target]}.log")
 )
 
-if options[:proxy]
-  Iovox::Client.configuration[:socks_proxy] = {
-    server: ENV["LOCAL_PROXY_SERVER"],
-    port: ENV["LOCAL_PROXY_PORT"]
-  }
-end
-
 Iovox::Client.configuration[:read_only] = true if options[:target] == :prod

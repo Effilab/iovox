@@ -20,8 +20,7 @@ RSpec.describe Iovox::Client do
           secure_key: securekey
         },
         logger: nil,
-        read_only: false,
-        socks_proxy: nil
+        read_only: false
       )
     end
 
@@ -92,38 +91,6 @@ RSpec.describe Iovox::Client do
       end
 
       include_examples "connection logger"
-    end
-  end
-
-  context "when a SOCKS proxy is configured" do
-    subject(:client) { described_class.new(config) }
-
-    let(:config) do
-      {socks_proxy: {server: "0.0.0.0", port: "8888"}}
-    end
-
-    before(:context) { require "iovox/middleware/net_http_socks_adapter" }
-
-    it "connects through the proxy" do
-      server, port = config[:socks_proxy].values_at(:server, :port)
-
-      # this will serve to interrupt and observe the request cycle
-      interrupt = Class.new(StandardError)
-
-      expect(Iovox::Middleware::NetHTTPSOCKS).to receive(:new)
-        .and_wrap_original do |m, *args, &block|
-          m.call(*args, &block).tap do |handler|
-            expect(handler).to receive(:request) do
-              expect(handler.socks_server).to eq(server)
-              expect(handler.socks_port).to eq(port)
-
-              # mock actual connection, we don't care about what would happen next
-              raise(interrupt)
-            end
-          end
-        end
-
-      expect { client.conn.get("/") }.to raise_error(interrupt)
     end
   end
 end

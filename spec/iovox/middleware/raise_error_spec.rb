@@ -16,12 +16,18 @@ RSpec.describe Iovox::Middleware::RaiseError do
   let(:env_data) do
     {
       status: 400,
-      response_headers: {},
+      response_headers: a_kind_of(Hash),
       body: {
         "errors" => {
           "error" => error
         }
-      }
+      },
+      method: a_kind_of(String),
+      url: double(path: a_kind_of(String), query: a_kind_of(String)),
+      request_headers: a_kind_of(Hash),
+      request_body: a_kind_of(String),
+      params_encoder: double(decode: a_kind_of(String)),
+      params: a_kind_of(Hash)
     }
   end
 

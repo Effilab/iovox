@@ -32,7 +32,6 @@ module Iovox
             username: ENV.fetch("IOVOX_USERNAME"),
             secure_key: ENV.fetch("IOVOX_SECURE_KEY")
           },
-          socks_proxy: nil,
           read_only: false,
           logger: nil
         }

@@ -20,8 +20,7 @@ RSpec.describe Iovox::Client do
           secure_key: securekey
         },
         logger: nil,
-        read_only: false,
-        socks_proxy: nil
+        read_only: false
       )
     end
 

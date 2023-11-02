@@ -2,6 +2,7 @@
 
 require "yaml"
 require "faraday"
+require "faraday/decode_xml"
 
 require_relative "string_inflector"
 require_relative "middleware/request"
@@ -74,7 +75,7 @@ module Iovox
         conn.use Middleware::Request, iovox_request_opts
         conn.use Middleware::XmlRequest
         conn.use Middleware::RaiseError
-        conn.response :xml, content_type: /\bxml$/
+        conn.response :xml
 
         if config[:logger]
           conn.response :logger, logger, bodies: true do |middleware|

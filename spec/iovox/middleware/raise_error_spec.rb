@@ -27,6 +27,7 @@ RSpec.describe Iovox::Middleware::RaiseError do
       request_headers: a_kind_of(Hash),
       request_body: a_kind_of(String),
       params_encoder: double(decode: a_kind_of(String)),
+      request: double(params_encoder: double),
       params: a_kind_of(Hash)
     }
   end

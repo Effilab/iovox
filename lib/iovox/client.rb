@@ -75,7 +75,7 @@ module Iovox
         conn.use Middleware::Request, iovox_request_opts
         conn.use Middleware::XmlRequest
         conn.use Middleware::RaiseError
-        conn.response :xml
+        conn.response :xml, content_type: /\bxml$/
 
         if config[:logger]
           conn.response :logger, logger, bodies: true do |middleware|

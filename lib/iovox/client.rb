@@ -69,7 +69,6 @@ module Iovox
       url = config.fetch(:url).to_s
       iovox_request_opts = config.fetch(:credentials).merge(output: "XML", version: API_VERSION)
 
-      # TODO
       Faraday.new(url: url) do |conn|
         conn.use Middleware::ReadOnly if read_only?
         conn.use Middleware::Request, iovox_request_opts

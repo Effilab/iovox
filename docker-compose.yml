@@ -1,0 +1,13 @@
+version: "3.7"
+
+services:
+  web:
+    image: iovox
+    build: .
+    volumes:
+      - .:/home/iovox
+      - iovox-gems-data:/home/iovox/vendor/bundle
+    command: bundle exec rspec
+
+volumes:
+  iovox-gems-data:

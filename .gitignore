@@ -18,3 +18,4 @@
 proxy_*.id_rsa
 dump.marshal
 dump.yaml
+.shell_history

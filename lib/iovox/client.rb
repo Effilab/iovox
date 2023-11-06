@@ -2,7 +2,7 @@
 
 require "yaml"
 require "faraday"
-require "faraday_middleware"
+require "faraday/decode_xml"
 
 require_relative "string_inflector"
 require_relative "middleware/request"

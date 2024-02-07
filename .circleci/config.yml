@@ -15,7 +15,7 @@ commands:
 jobs:
   build_3_x:
     docker:
-      - image: ruby:ruby:3.3-slim-bullseye
+      - image: ruby:3.3-slim-bullseye
     steps:
       - build
 

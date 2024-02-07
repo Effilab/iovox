@@ -1,5 +1,5 @@
 # Web application
-FROM ruby:3.3.0
+FROM ruby:3.3-slim-bullseye
 LABEL NAME=iovox
 LABEL VERSION=1.0
 

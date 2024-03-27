@@ -17,6 +17,7 @@ module Iovox
     require_relative "client/response"
 
     API_VERSION = "3"
+    SSL_OPTIONS = {version: :TLSv1_2}.freeze
 
     class << self
       def configuration
@@ -69,7 +70,7 @@ module Iovox
       url = config.fetch(:url).to_s
       iovox_request_opts = config.fetch(:credentials).merge(output: "XML", version: API_VERSION)
 
-      Faraday.new(url: url) do |conn|
+      Faraday.new(url: url, ssl: SSL_OPTIONS) do |conn|
         conn.use Middleware::ReadOnly if read_only?
         conn.use Middleware::Request, iovox_request_opts
         conn.use Middleware::XmlRequest
